@@ -14,7 +14,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.metaloom.utils.hash.impl.FileChannelHasher;
-import io.metaloom.utils.hash.impl.MemorySegmentHasher;
 import io.metaloom.utils.hash.impl.MmapHasher;
 
 @RunWith(Parameterized.class)
@@ -42,7 +41,7 @@ public class HashUtilsTest extends AbstractHasherTest {
 	@Parameters(name = "{index}: hasher:({0}), filesize({1})")
 	public static Collection<Object[]> data() {
 		Collection<Object[]> data = new ArrayList<>();
-		for (Hasher hasher : Arrays.asList(new MmapHasher(), new MemorySegmentHasher(), new FileChannelHasher())) {
+		for (Hasher hasher : Arrays.asList(new MmapHasher(), /*new MemorySegmentHasher(), */  new FileChannelHasher())) {
 			data.add(new Object[] { hasher, ZERO, ZERO_MD5, ZERO_SHA256, ZERO_SHA512, ZERO_CHUNK_HASH });
 			data.add(new Object[] { hasher, MINIMAL, MINIMAL_MD5, MINIMAL_SHA256, MINIMAL_SHA512, MINIMAL_CHUNK_HASH });
 			data.add(new Object[] { hasher, SMALL, SMALL_MD5, SMALL_SHA256, SMALL_SHA512, SMALL_CHUNK_HASH });
