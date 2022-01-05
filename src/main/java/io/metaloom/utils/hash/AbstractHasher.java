@@ -5,12 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class AbstractHasher implements Hasher {
-
-	public static final Logger log = LoggerFactory.getLogger(HashUtils.class);
 
 	public static MessageDigest md5;
 	public static MessageDigest md256;
