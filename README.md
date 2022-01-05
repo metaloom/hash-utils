@@ -16,8 +16,8 @@ new FileChannelHasher()..computeSHA512(file);
 This project currently contains three different hasher implementations
 
 
-| Name                 | Description |
-|----------------------|-------------|
-| FileChannelHasher    | Uses a filechannel to map regions of the file to memory.              |
-| MmapHasher           | Uses JNI to make use of Mmap to map file regions to direct memory.         |
-| MemorySegmentHasher  | Uses incubator classes from the JDK to map data to a memory segment.<br>Required JDK 14+ and additional JVM flags to module.   |
+| Name                          | Description |
+|-------------------------------|-------------|
+| FileChannelHasher (default)   | Uses a filechannel to map regions of the file to memory.              |
+| MmapHasher                    | Uses JNI to make use of Mmap to map file regions to direct memory.         |
+| MemorySegmentHasher           | Uses incubator classes from the JDK to map data to a memory segment.<br>Required JDK 14+ and additional JVM flags to module.   |
