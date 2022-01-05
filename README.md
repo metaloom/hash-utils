@@ -38,7 +38,7 @@ byte[] binHash = HashUtils.computeBinChunkHash(path);
 
 ## Implementations
 
-This project currently contains three different hasher implementations
+This project currently contains different hasher implementations:
 
 ```java
 //  Return the default hasher
