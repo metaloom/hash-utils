@@ -3,15 +3,13 @@ package io.metaloom.utils.hash;
 import java.io.File;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
+import static io.metaloom.utils.hash.HashUtils.bytesToHex;
 
 /**
  * A hasher provides methods to hash files and data using various algorithms.
  */
 public interface Hasher {
-
-	static final char[] hexArray = "0123456789abcdef".toCharArray();
 
 	/**
 	 * Compute a chunk hash of the file. The used hasher will only utilize the first 5MB or 0.05% of the provided file to compute the hash. The idea behind this
@@ -31,16 +29,75 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	String computeChunkHash(Path path);
+	default String computeChunkHash(Path path) {
+		return bytesToHex(computeBinChunkHash(path));
+	}
+
+	/**
+	 * Compute a chunk hash of the file. The used hasher will only utilize the first 5MB or 0.05% of the provided file to compute the hash. The idea behind this
+	 * method is to provide a quicker way to hash a file with the mentioned trade of.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	default byte[] computeBinChunkHash(File file) {
+		return computeBinChunkHash(file.toPath());
+	}
+
+	/**
+	 * Compute a chunk hash of the file. The used hasher will only utilize the first 5MB or 0.05% of the provided file to compute the hash. The idea behind this
+	 * method is to provide a quicker way to hash a file with the mentioned trade of.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	byte[] computeBinChunkHash(Path path);
 
 	/**
 	 * Compute the MD5 checksum of the data.
 	 * 
 	 * @param data
 	 * @return
-	 * @throws NoSuchAlgorithmException
 	 */
-	String computeMD5(byte[] data) throws NoSuchAlgorithmException;
+	String computeMD5(byte[] data);
+
+	/**
+	 * Compute the MD5 checksum.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	default String computeMD5(File file) {
+		return computeMD5(file.toPath());
+	}
+
+	/**
+	 * Compute the MD5 checksum.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	default String computeMD5(Path path) {
+		return bytesToHex(computeBinMD5(path));
+	}
+
+	/**
+	 * Compute the MD5 checksum.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	default byte[] computeBinMD5(File file) {
+		return computeBinMD5(file.toPath());
+	}
+
+	/**
+	 * Compute the MD5 checksum.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	byte[] computeBinMD5(Path path);
 
 	/**
 	 * Computes the SHA256 checksum.
@@ -53,12 +110,32 @@ public interface Hasher {
 	}
 
 	/**
-	 * Computes the SHA256 checksum
+	 * Computes the SHA256 checksum.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	default byte[] computeBinSHA256(File file) {
+		return computeBinSHA256(file.toPath());
+	}
+
+	/**
+	 * Computes the SHA256 checksum.
 	 * 
 	 * @param path
 	 * @return
 	 */
-	String computeSHA256(Path path);
+	default String computeSHA256(Path path) {
+		return bytesToHex(computeBinSHA256(path));
+	}
+
+	/**
+	 * Compute the SHA256 checksum.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	byte[] computeBinSHA256(Path path);
 
 	/**
 	 * Computes the SHA512 checksum.
@@ -76,7 +153,27 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	String computeSHA512(Path path);
+	default String computeSHA512(Path path) {
+		return bytesToHex(computeBinSHA512(path));
+	}
+
+	/**
+	 * Compute the SHA512 checksum.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	default byte[] computeBinSHA512(File file) {
+		return computeBinSHA512(file.toPath());
+	}
+
+	/**
+	 * Compute the SHA512 checksum.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	byte[] computeBinSHA512(Path path);
 
 	/**
 	 * Hash implementation to be used to process the file.
@@ -87,23 +184,8 @@ public interface Hasher {
 	 *            Actual digest to generate SHA256, SHA512
 	 * @param lenModifier
 	 *            Modifier which can be used to reduce the length of the data being hashed.
-	 * @return
+	 * @return Hashsum in binary form
 	 */
-	String hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
+	byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
 
-	/**
-	 * Convert the byte array to a hex formatted string.
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	static String bytesToHex(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		for (int j = 0; j < bytes.length; j++) {
-			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
-	}
 }

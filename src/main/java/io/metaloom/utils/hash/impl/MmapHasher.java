@@ -8,21 +8,14 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.indeed.util.mmap.MMapBuffer;
 
 import io.metaloom.utils.hash.AbstractHasher;
-import io.metaloom.utils.hash.HashUtils;
-import io.metaloom.utils.hash.Hasher;
 
 public class MmapHasher extends AbstractHasher {
 
-	public static final Logger log = LoggerFactory.getLogger(HashUtils.class);
-
 	@Override
-	public String hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
+	public byte[] hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
 		try (MMapBuffer buffer = new MMapBuffer(
 			path,
 			FileChannel.MapMode.READ_ONLY,
@@ -43,13 +36,10 @@ public class MmapHasher extends AbstractHasher {
 				start += bufferSize;
 			}
 			byte[] result = dig.digest();
-			return Hasher.bytesToHex(result);
+			return result;
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new RuntimeException("Could not compute hash for {" + path + "}", e);
 		}
 	}
-
-
 
 }

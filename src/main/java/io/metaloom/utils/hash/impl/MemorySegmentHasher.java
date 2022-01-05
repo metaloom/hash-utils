@@ -9,7 +9,6 @@ import java.security.MessageDigest;
 import java.util.function.Function;
 
 import io.metaloom.utils.hash.AbstractHasher;
-import io.metaloom.utils.hash.Hasher;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
 
@@ -19,12 +18,13 @@ import jdk.incubator.foreign.ResourceScope;
  */
 public final class MemorySegmentHasher extends AbstractHasher {
 
-	public String hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
+	@Override
+	public byte[] hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
 		try {
 			long size = Files.size(path);
 			if (size == 0) {
 				byte[] result = dig.digest();
-				return Hasher.bytesToHex(result);
+				return result; 
 			}
 
 			try (var scope = ResourceScope.newConfinedScope()) {
@@ -52,7 +52,7 @@ public final class MemorySegmentHasher extends AbstractHasher {
 					start += bufferSize;
 				}
 				byte[] result = dig.digest();
-				return Hasher.bytesToHex(result);
+				return result;
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Could not compute hash for {" + path + "}", e);

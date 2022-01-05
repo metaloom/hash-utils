@@ -37,7 +37,28 @@ public abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
-	public String computeChunkHash(Path path) {
+	public String computeMD5(byte[] data) {
+		md5.update(data);
+		return getHash(md5);
+	}
+
+	@Override
+	public byte[] computeBinMD5(Path path) {
+		return hash(path, md5, null);
+	}
+
+	@Override
+	public byte[] computeBinSHA256(Path path) {
+		return hash(path, md256, null);
+	}
+
+	@Override
+	public byte[] computeBinSHA512(Path path) {
+		return hash(path, md512, null);
+	}
+
+	@Override
+	public byte[] computeBinChunkHash(Path path) {
 		long MINIMUM_CHUNK_HASH_SIZE = 5 * 1024 * 1024; // 5 MB
 		double MINIMUM_PERCENT = 0.05;
 
@@ -66,22 +87,6 @@ public abstract class AbstractHasher implements Hasher {
 		});
 	}
 
-	@Override
-	public String computeSHA256(Path path) {
-		return hash(path, md256, null);
-	}
-
-	@Override
-	public String computeSHA512(Path path) {
-		return hash(path, md512, null);
-	}
-
-	@Override
-	public String computeMD5(byte[] data) throws NoSuchAlgorithmException {
-		md5.update(data);
-		return getHash(md5);
-	}
-
 	private String getHash(MessageDigest md) {
 		byte[] hashBytes = md.digest();
 		StringBuilder sb = new StringBuilder(2 * hashBytes.length);
@@ -92,7 +97,7 @@ public abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
-	public abstract String hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
+	public abstract byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
 
 	@Override
 	public String toString() {

@@ -9,14 +9,14 @@ import java.security.MessageDigest;
 import java.util.function.Function;
 
 import io.metaloom.utils.hash.AbstractHasher;
-import io.metaloom.utils.hash.Hasher;
 
 /**
  * Hasher implementation which uses the {@link FileChannel} to map regions to memory.
  */
 public class FileChannelHasher extends AbstractHasher {
 
-	public String hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
+	@Override
+	public byte[] hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
 
 		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
 			FileChannel fileChannel = rafile.getChannel();
@@ -38,8 +38,7 @@ public class FileChannelHasher extends AbstractHasher {
 				start += bufferSize;
 			}
 			byte[] result = dig.digest();
-			return Hasher.bytesToHex(result);
-
+			return result;
 		} catch (Exception e) {
 			throw new RuntimeException("Could not compute hash for {" + path + "}", e);
 		}
