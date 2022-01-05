@@ -43,6 +43,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Required shim to workaround the log4j dependency of util-mmap -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.32</version>
+		</dependency>
 
 		<!-- Test -->
 		<dependency>
@@ -50,6 +56,12 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
