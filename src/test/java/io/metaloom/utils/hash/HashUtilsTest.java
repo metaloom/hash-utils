@@ -20,7 +20,7 @@ import io.metaloom.utils.hash.impl.MmapHasher;
 @RunWith(Parameterized.class)
 public class HashUtilsTest extends AbstractHasherTest {
 
-	public static final int TEST_RUNS = 1;
+	public static final int TEST_RUNS = 15;
 
 	// Parameters
 	private final long len;
@@ -54,9 +54,11 @@ public class HashUtilsTest extends AbstractHasherTest {
 	@Test
 	public void testHashMD5() {
 		Path path = createTestFile(len);
-		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(md5, hasher.computeMD5(path));
-		}
+//		time(len,"md5", hasher, () -> {
+			for (int i = 0; i < TEST_RUNS; i++) {
+				assertEquals(md5, hasher.computeMD5(path));
+			}
+//		});
 		assertEquals(md5, bytesToHex(hasher.computeBinMD5(path.toFile())));
 		assertEquals(md5, bytesToHex(hasher.computeBinMD5(path)));
 		assertEquals(md5, hasher.computeMD5(path.toFile()));
@@ -65,9 +67,11 @@ public class HashUtilsTest extends AbstractHasherTest {
 	@Test
 	public void testHash256() {
 		Path path = createTestFile(len);
-		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(sha256, hasher.computeSHA256(path));
-		}
+//		time(len, "sha256", hasher, () -> {
+			for (int i = 0; i < TEST_RUNS; i++) {
+				assertEquals(sha256, hasher.computeSHA256(path));
+			}
+//		});
 		assertEquals(sha256, bytesToHex(hasher.computeBinSHA256(path.toFile())));
 		assertEquals(sha256, bytesToHex(hasher.computeBinSHA256(path)));
 		assertEquals(sha256, hasher.computeSHA256(path.toFile()));
@@ -76,9 +80,11 @@ public class HashUtilsTest extends AbstractHasherTest {
 	@Test
 	public void testHash512() {
 		Path path = createTestFile(len);
-		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(sha512, hasher.computeSHA512(path));
-		}
+		time(len, "sha512", hasher, () -> {
+			for (int i = 0; i < TEST_RUNS; i++) {
+				assertEquals(sha512, hasher.computeSHA512(path));
+			}
+		});
 		assertEquals(sha512, bytesToHex(hasher.computeBinSHA512(path.toFile())));
 		assertEquals(sha512, bytesToHex(hasher.computeBinSHA512(path)));
 		assertEquals(sha512, hasher.computeSHA512(path.toFile()));
@@ -87,9 +93,11 @@ public class HashUtilsTest extends AbstractHasherTest {
 	@Test
 	public void testChunkHash() {
 		Path path = createTestFile(len);
-		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(chunkHash, hasher.computeChunkHash(path));
-		}
+//		time(len, "chunkHash", hasher, () -> {
+			for (int i = 0; i < TEST_RUNS; i++) {
+				assertEquals(chunkHash, hasher.computeChunkHash(path));
+			}
+//		});
 		assertEquals(chunkHash, bytesToHex(hasher.computeBinChunkHash(path.toFile())));
 		assertEquals(chunkHash, bytesToHex(hasher.computeBinChunkHash(path)));
 		assertEquals(chunkHash, hasher.computeChunkHash(path.toFile()));

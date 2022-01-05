@@ -31,12 +31,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>io.metaloom.utils</groupId>
-			<artifactId>utils</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-
 		<!-- mmap -->
 		<dependency>
 			<groupId>com.indeed</groupId>

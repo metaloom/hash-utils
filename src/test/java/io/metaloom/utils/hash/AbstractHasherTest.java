@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.nio.file.Path;
 
 public abstract class AbstractHasherTest {
@@ -32,7 +34,7 @@ public abstract class AbstractHasherTest {
 	public static final String LARGE_SHA512 = "32698caf5f32c2e4d6b7ad4ca851e0f5e130bf054231eaa7345a27c31776ffb039f2a0070a78cca0ff82b7bb6303fdaa0aa2bce580101c7eadf9bae6adf6e29c";
 	public static final String LARGE_CHUNK_HASH = "5449ecf9b06ad82bf75a0f1de67f1d8b40142c416dc93039c84a3ae6a98bb2cb";
 
-	public Path createTestFile(long size) {
+	protected Path createTestFile(long size) {
 		try {
 			File file = new File("target/test_" + size);
 			if (file.exists()) {
@@ -47,5 +49,14 @@ public abstract class AbstractHasherTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected void time(long len, String prefix, Hasher hasher, Runnable code) {
+		ThreadMXBean tm = ManagementFactory.getThreadMXBean();
+		long before = tm.getThreadCpuTime(Thread.currentThread().getId());
+		code.run();
+		long after = tm.getThreadCpuTime(Thread.currentThread().getId());
+		long delta = after - before;
+		System.out.println(prefix + "@" + len + ">" + hasher + "\ttook: " + delta / 1000 + " ms");
 	}
 }

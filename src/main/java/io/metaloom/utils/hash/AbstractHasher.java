@@ -8,8 +8,6 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.metaloom.utils.ConvertUtils;
-
 public abstract class AbstractHasher implements Hasher {
 
 	public static final Logger log = LoggerFactory.getLogger(HashUtils.class);
@@ -64,13 +62,7 @@ public abstract class AbstractHasher implements Hasher {
 
 		return hash(path, md256, len -> {
 			long size = len;
-			if (log.isDebugEnabled()) {
-				log.debug("Size: " + ConvertUtils.toHumanSize(size));
-			}
 			len = (long) (len * MINIMUM_PERCENT);
-			if (log.isDebugEnabled()) {
-				log.debug("Len: " + ConvertUtils.toHumanSize(len));
-			}
 			// If the minimum via percent
 			if (len < MINIMUM_CHUNK_HASH_SIZE) {
 				len = MINIMUM_CHUNK_HASH_SIZE;
@@ -78,9 +70,6 @@ public abstract class AbstractHasher implements Hasher {
 				if (len > size) {
 					len = size;
 				}
-			}
-			if (log.isDebugEnabled()) {
-				log.debug("Len:" + ConvertUtils.toHumanSize(len));
 			}
 			return len;
 
