@@ -19,7 +19,7 @@ import io.metaloom.utils.hash.impl.MmapHasher;
 @RunWith(Parameterized.class)
 public class HashUtilsTest extends AbstractHasherTest {
 
-	public static final int TEST_RUNS = 15;
+	public static final int TEST_RUNS = 5;
 
 	// Parameters
 	private final long len;

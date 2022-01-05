@@ -5,7 +5,8 @@
 
 	<groupId>io.metaloom.utils</groupId>
 	<artifactId>hash-utils</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>io.metaloom</groupId>
@@ -61,7 +62,6 @@
 			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
