@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>util-mmap</artifactId>
-			<version>1.0.31</version>
+			<version>1.0.36</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>
@@ -44,6 +44,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.0.1-jre</version>
+		</dependency>
+
 		<!-- Required shim to workaround the log4j dependency of util-mmap -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
