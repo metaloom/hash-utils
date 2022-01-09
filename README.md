@@ -2,6 +2,17 @@
 
 This project contains utilities to hash files with SHA256/SHA512.
 
+
+## Maven
+
+```xml
+<dependency>
+  <groupId>io.metaloom.utils</groupId>
+  <artifactId>hash-utils</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
 ### Algorithms
 
 ## MD5
