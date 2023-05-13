@@ -14,7 +14,7 @@
 		<version>2.0.2-SNAPSHOT</version>
 	</parent>
 
-	<name>hash-utils</name>
+	<name>Hash Utils</name>
 	<url>https://github.com/metaloom/hash-utils</url>
 	<description>A collection of hash utils</description>
 	<inceptionYear>2022</inceptionYear>
