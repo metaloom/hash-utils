@@ -53,10 +53,10 @@ public abstract class AbstractHasherTest {
 
 	protected void time(long len, String prefix, Hasher hasher, Runnable code) {
 		ThreadMXBean tm = ManagementFactory.getThreadMXBean();
-		long before = tm.getThreadCpuTime(Thread.currentThread().getId());
+		long before = tm.getThreadCpuTime(Thread.currentThread().threadId());
 		code.run();
-		long after = tm.getThreadCpuTime(Thread.currentThread().getId());
+		long after = tm.getThreadCpuTime(Thread.currentThread().threadId());
 		long delta = after - before;
-		System.out.println(prefix + "@" + len + ">" + hasher + "\ttook: " + delta / 1000 + " ms");
+		System.out.println(prefix + "@" + len + " > " + hasher + "\ttook: " + delta / 1000 + " ms");
 	}
 }

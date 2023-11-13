@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import io.metaloom.utils.hash.impl.FileChannelHasher;
-import io.metaloom.utils.hash.impl.MmapHasher;
+import io.metaloom.utils.hash.impl.MemorySegmentHasher;
 
 public class HashUtilsTest extends AbstractHasherTest {
 
@@ -23,7 +23,7 @@ public class HashUtilsTest extends AbstractHasherTest {
 
 	private static Stream<Arguments> hashes() {
 		Collection<Arguments> data = new ArrayList<>();
-		for (Hasher hasher : Arrays.asList(new MmapHasher(), /* new MemorySegmentHasher(), */ new FileChannelHasher())) {
+		for (Hasher hasher : Arrays.asList(new MemorySegmentHasher(), new FileChannelHasher())) {
 			data.add(arguments(hasher, ZERO, ZERO_MD5, ZERO_SHA256, ZERO_SHA512, ZERO_CHUNK_HASH));
 			data.add(arguments(hasher, MINIMAL, MINIMAL_MD5, MINIMAL_SHA256, MINIMAL_SHA512, MINIMAL_CHUNK_HASH));
 			data.add(arguments(hasher, SMALL, SMALL_MD5, SMALL_SHA256, SMALL_SHA512, SMALL_CHUNK_HASH));

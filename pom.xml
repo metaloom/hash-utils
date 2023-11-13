@@ -1,90 +1,78 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>io.metaloom.utils</groupId>
-	<artifactId>hash-utils</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <groupId>io.metaloom.utils</groupId>
+    <artifactId>hash-utils</artifactId>
+    <version>0.3.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<parent>
-		<groupId>io.metaloom</groupId>
-		<artifactId>maven-parent</artifactId>
-		<version>2.0.3-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>io.metaloom</groupId>
+        <artifactId>maven-parent</artifactId>
+        <version>2.0.3-SNAPSHOT</version>
+    </parent>
 
-	<name>Hash Utils</name>
-	<url>https://github.com/metaloom/hash-utils</url>
-	<description>A collection of hash utils</description>
-	<inceptionYear>2022</inceptionYear>
+    <name>Hash Utils</name>
+    <url>https://github.com/metaloom/hash-utils</url>
+    <description>A collection of hash utils</description>
+    <inceptionYear>2022</inceptionYear>
 
-	<scm>
-		<connection>scm:git:git@github.com:metaloom/hash-utils.git</connection>
-		<developerConnection>scm:git:git@github.com:metaloom/hash-utils.git</developerConnection>
-		<url>https://github.com/metaloom/hash-utils</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <connection>scm:git:git@github.com:metaloom/hash-utils.git</connection>
+        <developerConnection>scm:git:git@github.com:metaloom/hash-utils.git</developerConnection>
+        <url>https://github.com/metaloom/hash-utils</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.github.repository>metaloom/hash-utils</project.github.repository>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.github.repository>metaloom/hash-utils</project.github.repository>
+    </properties>
 
-	<dependencies>
-		<!-- mmap -->
-		<dependency>
-			<groupId>com.indeed</groupId>
-			<artifactId>util-mmap</artifactId>
-			<version>1.0.36</version>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>31.0.1-jre</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+        </dependency>
 
-		<!-- Required shim to workaround the log4j dependency of util-mmap -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>1.7.32</version>
-		</dependency>
+        <!-- Required shim to workaround the log4j dependency of util-mmap -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.32</version>
+        </dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<release>11</release>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>21</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 

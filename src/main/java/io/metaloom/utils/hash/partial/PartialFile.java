@@ -2,14 +2,14 @@ package io.metaloom.utils.hash.partial;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteOrder;
+import java.io.RandomAccessFile;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.indeed.util.mmap.MMapBuffer;
 
 import io.metaloom.utils.hash.HashUtils;
 
@@ -36,22 +36,18 @@ public class PartialFile {
 			return zeroByteSize;
 		}
 
-		MMapBuffer buffer = new MMapBuffer(
-			file,
-			FileChannel.MapMode.READ_ONLY,
-			ByteOrder.LITTLE_ENDIAN);
+		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
+			FileChannel fileChannel = rafile.getChannel();
 
-		try {
+			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
 			long start = 1 * 1024 * chunkSize; // 4 MB
 			for (long i = start; i + chunkSize < file.length(); i += chunkSize) {
-				byte[] chunk = new byte[chunkSize];
-				buffer.memory().getBytes(i, chunk);
+				MemorySegment slice = seg.asSlice(i, chunkSize);
+				byte[] chunk = slice.asByteBuffer().array();
 				if (isZeroChunk(chunk)) {
 					zeroByteSize += chunkSize;
 				}
 			}
-		} finally {
-			buffer.close();
 		}
 		if (zeroByteSize == -1) {
 			zeroByteSize = 0;
@@ -71,16 +67,15 @@ public class PartialFile {
 			return segmentHashes;
 		}
 
-		MMapBuffer buffer = new MMapBuffer(
-			file,
-			FileChannel.MapMode.READ_ONLY,
-			ByteOrder.LITTLE_ENDIAN);
+		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
+			FileChannel fileChannel = rafile.getChannel();
 
-		try {
+			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
+
 			long start = 1 * 1024 * CHUNK_SIZE; // 4 MB
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
-				byte[] chunk = new byte[CHUNK_SIZE];
-				buffer.memory().getBytes(i, chunk);
+				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
+				byte[] chunk = slice.asByteBuffer().array();
 				if (!isZeroChunk(chunk)) {
 					// We were previously in zero area. This means a new chunk starts
 					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));
@@ -91,8 +86,7 @@ public class PartialFile {
 					break;
 				}
 			}
-		} finally {
-			buffer.close();
+
 		}
 		return segmentHashes;
 	}
@@ -132,16 +126,15 @@ public class PartialFile {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public double compareTo(File file) throws IOException, NoSuchAlgorithmException {
-		MMapBuffer buffer = new MMapBuffer(
-			file,
-			FileChannel.MapMode.READ_ONLY,
-			ByteOrder.LITTLE_ENDIAN);
-		try {
+		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
+			FileChannel fileChannel = rafile.getChannel();
+
+			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
 			long score = 0;
 			for (SegmentHash hash : computeHashes()) {
 				long start = hash.getStart();
-				byte[] dst = new byte[hash.getLen()];
-				buffer.memory().getBytes(start, dst);
+				MemorySegment slice = seg.asSlice(start, hash.getLen());
+				byte[] dst = slice.asByteBuffer().array();
 				String newHash = HashUtils.computeMD5(dst);
 				if (newHash.equals(hash.getHash())) {
 					score++;
@@ -150,8 +143,7 @@ public class PartialFile {
 
 			System.out.println("Matches: " + score + " out of " + computeHashes().size());
 			return (double) score / (double) computeHashes().size();
-		} finally {
-			buffer.close();
+
 		}
 	}
 
