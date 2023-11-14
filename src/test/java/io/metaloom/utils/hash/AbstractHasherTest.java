@@ -2,13 +2,17 @@ package io.metaloom.utils.hash;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.nio.file.Path;
+import java.util.Random;
 
 public abstract class AbstractHasherTest {
+
+	private static final Random RANDOM = new Random();
 
 	public static final int ZERO = 0;
 	public static final String ZERO_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
@@ -33,6 +37,53 @@ public abstract class AbstractHasherTest {
 	public static final String LARGE_SHA256 = "1cf6b3be283d1022c26426d4f5d13f5303d044126cd76c5fa0e834d837bdb0ca";
 	public static final String LARGE_SHA512 = "32698caf5f32c2e4d6b7ad4ca851e0f5e130bf054231eaa7345a27c31776ffb039f2a0070a78cca0ff82b7bb6303fdaa0aa2bce580101c7eadf9bae6adf6e29c";
 	public static final String LARGE_CHUNK_HASH = "5449ecf9b06ad82bf75a0f1de67f1d8b40142c416dc93039c84a3ae6a98bb2cb";
+
+	protected Path createTestFile(long nRandomBytes, int zeroChunkCount) {
+		try {
+			File file = new File("target/chunk_test_" + nRandomBytes + "_" + zeroChunkCount);
+			if (file.exists()) {
+				return file.toPath();
+			}
+			int chunkSize = 4096;
+			int bufferSize = 4096;
+			try (FileOutputStream fos = new FileOutputStream(file)) {
+				long nBuffers = nRandomBytes / bufferSize;
+				int remaining = (int) (nRandomBytes % bufferSize);
+				for (int nBuffer = 0; nBuffer <= nBuffers; nBuffer++) {
+					byte[] chunk = randomBytes(bufferSize);
+					fos.write(chunk);
+				}
+				if (remaining != 0) {
+					byte[] chunk = randomBytes(remaining);
+					fos.write(chunk);
+				}
+
+				for (int nChunk = 0; nChunk <= zeroChunkCount; nChunk++) {
+					byte[] chunk = zeroChunk(chunkSize);
+					fos.write(chunk);
+				}
+
+				// fos.write(randomBytes(1024));
+			}
+			return file.toPath();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private byte[] zeroChunk(int chunkSize) {
+		byte[] data = new byte[chunkSize];
+		for (int i = 0; i < data.length; i++) {
+			data[i] = 0;
+		}
+		return data;
+	}
+
+	private byte[] randomBytes(int chunkSize) {
+		byte[] data = new byte[chunkSize];
+		RANDOM.nextBytes(data);
+		return data;
+	}
 
 	protected Path createTestFile(long size) {
 		try {

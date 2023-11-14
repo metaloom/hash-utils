@@ -1,6 +1,7 @@
 package io.metaloom.utils.hash;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,7 +19,11 @@ public final class HashUtils {
 	}
 
 	public static String computeChunkHash(Path path) {
-		return DEFAULT_HASHER.computeChunkHash(path.toFile());
+		return DEFAULT_HASHER.computeChunkHash(path);
+	}
+
+	public static byte[] computeBinChunkHash(Path path) {
+		return DEFAULT_HASHER.computeBinChunkHash(path);
 	}
 
 	public static String computeMD5Hash(byte[] chunk) throws NoSuchAlgorithmException {
@@ -33,6 +38,10 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeSHA256(path);
 	}
 
+	public static byte[] computeBinSHA256(Path path) {
+		return DEFAULT_HASHER.computeBinSHA256(path);
+	}
+
 	public static String computeSHA512(File file) {
 		return DEFAULT_HASHER.computeSHA512(file.toPath());
 	}
@@ -41,14 +50,27 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeSHA512(path);
 	}
 
+	public static byte[] computeBinSHA512(Path path) {
+		return DEFAULT_HASHER.computeBinSHA512(path);
+	}
+
 	public static String computeMD5(Path path) {
 		return DEFAULT_HASHER.computeMD5(path);
+	}
+
+	public static byte[] computeBinMD5(Path path) {
+		return DEFAULT_HASHER.computeBinMD5(path);
 	}
 
 	public static String computeMD5(byte[] data) {
 		return DEFAULT_HASHER.computeMD5(data);
 	}
 
+	public static int computeZeroChunkCount(Path path) throws IOException {
+		return DEFAULT_HASHER.computeZeroChunkCount(path);
+	}
+
+	
 	/**
 	 * Convert the byte array to a hex formatted string.
 	 * 
@@ -80,5 +102,16 @@ public final class HashUtils {
 		}
 		return data;
 	}
+	
+	
+	public static boolean isZeroChunk(byte[] chunk) {
+		for (int i = 0; i < chunk.length; i++) {
+			if (chunk[i] != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 }

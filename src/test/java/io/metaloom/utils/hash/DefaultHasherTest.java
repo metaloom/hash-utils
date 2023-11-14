@@ -1,6 +1,7 @@
 package io.metaloom.utils.hash;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +39,20 @@ public class DefaultHasherTest extends AbstractHasherTest {
 		System.out.println(h1);
 		String h2 = HashUtils.computeSHA512(file);
 		assertEquals(h1, h2);
+	}
+
+	@Test
+	public void testHash512RandomFile() {
+		// time(len, "chunkHash", hasher, () -> {
+		int len = LARGE;
+		for (int i = 0; i < 10; i++) {
+			Path path = createTestFile(len++, 0);
+			Hasher hasher = DefaultHasher.getHasher();
+			String hash = hasher.computeSHA512(path);
+			System.out.println(len + " " + hash);
+			assertNotNull(hash);
+		}
+		// });
 	}
 
 }

@@ -18,25 +18,19 @@ This project contains utilities to hash files with SHA256/SHA512.
 ## MD5
 
 ```java
-Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeMD5(path);
-byte[] binHash = HashUtils.computeBinMD5(path);
+%{snippet|id=md5.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
 ```
 
 ## SHA256
 
 ```java
-Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeSHA256(path);
-byte[] binHash = HashUtils.computeBinSHA256(path);
+%{snippet|id=sha256.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
 ```
 
 ## SHA512
 
 ```java
-Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeSHA512(path);
-byte[] binHash = HashUtils.computeBinSHA512(path);
+%{snippet|id=sha512.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
 ```
 
 ## Chunk Hash
@@ -44,9 +38,7 @@ byte[] binHash = HashUtils.computeBinSHA512(path);
 The chunk hash method will only hash the first 5 MB or 5% of the provided path. This method may be used when the performance / precision tradeof is acceptable.
 
 ```java
-Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeChunkHash(path);
-byte[] binHash = HashUtils.computeBinChunkHash(path);
+%{snippet|id=chunk.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
 
 ```
 

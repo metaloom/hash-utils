@@ -1,10 +1,15 @@
 package io.metaloom.utils.hash;
 
+import static io.metaloom.utils.hash.HashUtils.bytesToHex;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import static io.metaloom.utils.hash.HashUtils.bytesToHex;
 
 /**
  * A hasher provides methods to hash files and data using various algorithms.
@@ -176,6 +181,14 @@ public interface Hasher {
 	byte[] computeBinSHA512(Path path);
 
 	/**
+	 * Compute the amount of zero byte chunks (4kb) that could be found in the given file.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	int computeZeroChunkCount(Path path) throws IOException;
+
+	/**
 	 * Hash implementation to be used to process the file.
 	 * 
 	 * @param path
@@ -187,5 +200,17 @@ public interface Hasher {
 	 * @return Hashsum in binary form
 	 */
 	byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
+
+	/**
+	 * Chunk reader implementation which can be used to parse chunks of a file.
+	 * 
+	 * @param channel
+	 *            Channel from which the chunks will be read
+	 * @param chunkSize
+	 *            Size of the chunks being read in bytes
+	 * @param chunkData
+	 *            Consumer which can process each chunk
+	 */
+	void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
 
 }

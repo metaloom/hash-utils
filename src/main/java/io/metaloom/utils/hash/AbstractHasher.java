@@ -1,11 +1,18 @@
 package io.metaloom.utils.hash;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AbstractHasher implements Hasher {
+
+	public final int DEFAULT_ZERO_CHUNK_SIZE = 4096;
 
 	public static MessageDigest md5;
 	public static MessageDigest md256;
@@ -71,6 +78,25 @@ public abstract class AbstractHasher implements Hasher {
 		});
 	}
 
+	@Override
+	public int computeZeroChunkCount(Path path) throws IOException {
+		AtomicInteger zeroByteSize = new AtomicInteger(0);
+		AtomicInteger nChunk = new AtomicInteger(0);
+		System.out.println();
+		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
+			FileChannel fileChannel = rafile.getChannel();
+			final int chunkSize = DEFAULT_ZERO_CHUNK_SIZE;
+			readChunks(fileChannel, chunkSize, chunk -> {
+				if (HashUtils.isZeroChunk(chunk)) {
+					zeroByteSize.set(zeroByteSize.get() + chunkSize);
+				}
+				System.out.println("Chunk: " + nChunk.incrementAndGet() +  " "  + HashUtils.isZeroChunk(chunk));
+			});
+		}
+
+		return zeroByteSize.get();
+	}
+
 	private String getHash(MessageDigest md) {
 		byte[] hashBytes = md.digest();
 		StringBuilder sb = new StringBuilder(2 * hashBytes.length);
@@ -82,6 +108,9 @@ public abstract class AbstractHasher implements Hasher {
 
 	@Override
 	public abstract byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
+
+	@Override
+	public abstract void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
 
 	@Override
 	public String toString() {

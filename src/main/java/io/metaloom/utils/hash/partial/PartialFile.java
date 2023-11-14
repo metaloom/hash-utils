@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout.OfByte;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -37,16 +38,20 @@ public class PartialFile {
 		}
 
 		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
-			FileChannel fileChannel = rafile.getChannel();
-
-			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
+			FileChannel channel = rafile.getChannel();
+			long len = channel.size();
+			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, Arena.ofConfined());
 			long start = 1 * 1024 * chunkSize; // 4 MB
-			for (long i = start; i + chunkSize < file.length(); i += chunkSize) {
-				MemorySegment slice = seg.asSlice(i, chunkSize);
-				byte[] chunk = slice.asByteBuffer().array();
-				if (isZeroChunk(chunk)) {
+			zeroByteSize=0;
+			while (start < len) {
+				long remaining = len - start;
+				int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
+				MemorySegment slice = seg.asSlice(start, bufferSize);
+				byte[] chunk = slice.toArray(OfByte.JAVA_BYTE);
+				if (HashUtils.isZeroChunk(chunk)) {
 					zeroByteSize += chunkSize;
 				}
+				start += bufferSize;
 			}
 		}
 		if (zeroByteSize == -1) {
@@ -76,7 +81,7 @@ public class PartialFile {
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
 				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
 				byte[] chunk = slice.asByteBuffer().array();
-				if (!isZeroChunk(chunk)) {
+				if (!HashUtils.isZeroChunk(chunk)) {
 					// We were previously in zero area. This means a new chunk starts
 					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));
 					segmentHashes.add(sh);
@@ -106,15 +111,6 @@ public class PartialFile {
 	@Override
 	public String toString() {
 		return file.getAbsolutePath() + " size: " + size;
-	}
-
-	private static boolean isZeroChunk(byte[] chunk) {
-		for (int i = 0; i < chunk.length; i++) {
-			if (chunk[i] != 0) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**

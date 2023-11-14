@@ -1,11 +1,14 @@
 package io.metaloom.utils.hash.impl;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.metaloom.utils.hash.AbstractHasher;
@@ -24,7 +27,7 @@ public class FileChannelHasher extends AbstractHasher {
 			MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
 
 			long start = 0;
-			long len = Files.size(path);
+			long len = fileChannel.size();
 			if (lenModifier != null) {
 				len = lenModifier.apply(len);
 			}
@@ -41,6 +44,23 @@ public class FileChannelHasher extends AbstractHasher {
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException("Could not compute hash for {" + path + "}", e);
+		}
+
+	}
+
+	@Override
+	public void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkReader) throws IOException {
+		long len = channel.size();
+		MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, len);
+		long start = 1 * 1024 * chunkSize; // 4 MB
+		while (start < len) {
+			long remaining = len - start;
+			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
+			System.out.println(bufferSize);
+			byte[] dst = new byte[bufferSize];
+			buffer.get((int) start, dst, 0, bufferSize);
+			chunkReader.accept(dst);
+			start += bufferSize;
 		}
 
 	}
