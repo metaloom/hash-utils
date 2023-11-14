@@ -62,13 +62,11 @@ Hasher hasher = DefaultHasher.getHasher();
 Hasher hasher = new FileChannelHasher();
 ```
 
-
-| Name                          | Description |
-|-------------------------------|-------------|
-| MemorySegmentHasher        (default)   | Uses the JEP 424 foreign memory allocation API to memory map files.              
-
-| MmapHasher        (legacy/removed)   | Uses JNI to make use of Mmap to map file regions to direct memory.                                                                    |
-| FileChannelHasher             | Uses a filechannel to map regions of the file to memory. This implementation only supports files which are smaller Integer.MAX_VALUE  |
+| Name                   | State             |            Description  |
+|------------------------|-------------------|-------------------------|
+| MemorySegmentHasher    | (default)         | Uses the JEP 424 foreign memory allocation API to memory map files.              
+| FileChannelHasher      | -                 | Uses a filechannel to map regions of the file to memory. This implementation only supports files which are smaller Integer.MAX_VALUE  |
+| MmapHasher             | (legacy/removed)  | Uses JNI to make use of Mmap to map file regions to direct memory.                                                                    |
 
 
 ## Release Process
