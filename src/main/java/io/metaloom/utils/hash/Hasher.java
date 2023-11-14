@@ -206,11 +206,15 @@ public interface Hasher {
 	 * 
 	 * @param channel
 	 *            Channel from which the chunks will be read
+	 * @param start
+	 *            Start offset from which to start reading
+	 * @param len
+	 *            Length of bytes to read
 	 * @param chunkSize
 	 *            Size of the chunks being read in bytes
 	 * @param chunkData
 	 *            Consumer which can process each chunk
 	 */
-	void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
+	void readChunks(FileChannel channel, long start, long len, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
 
 }

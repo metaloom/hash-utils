@@ -21,7 +21,7 @@ import io.metaloom.utils.hash.partial.PartialFile;
 
 public class ZeroChunkCountTest extends AbstractHasherTest {
 
-	public static final int TEST_RUNS = 5;
+	public static final int NO_ZERO_CHUNKS = 0;
 	public static final int EMPTY = 0;
 	public static final int ONE_CHUNK = 1 * 4096;
 	public static final int TEN_CHUNKS = 10 * 4096;
@@ -31,41 +31,37 @@ public class ZeroChunkCountTest extends AbstractHasherTest {
 	private static Stream<Arguments> hashes() {
 		Collection<Arguments> data = new ArrayList<>();
 		for (Hasher hasher : Arrays.asList(new MemorySegmentHasher(), new FileChannelHasher())) {
-			data.add(arguments(hasher, ZERO, 20, 0));
-			data.add(arguments(hasher, ONE_CHUNK, 20, 0));
-			data.add(arguments(hasher, TEN_CHUNKS, 20, 0));
-			data.add(arguments(hasher, ONE_K_CHUNKS, 2, 3));
-			data.add(arguments(hasher, ONE_K_OVER_CHUNKS, 2, 2 - 1));
+			data.add(arguments(hasher));
 		}
 		return data.stream();
 	}
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testNoZeroChunkCount(Hasher hasher, long len, int nZeroChunks) throws IOException, NoSuchAlgorithmException {
-		Path path = createTestFile(len, 0);
-		long count = new PartialFile(path).computeZeroChunkCount();
-		// time(len, "chunkHash", hasher, () -> {
-		// for (int i = 0; i < TEST_RUNS; i++) {
-		assertEquals(0, count);
-		assertEquals(0, hasher.computeZeroChunkCount(path));
-		// }
-		// });
+	public void testNoZeroChunkCount(Hasher hasher) throws IOException, NoSuchAlgorithmException {
+		assertZeroCountCheck(hasher, createTestFile(EMPTY, 0), NO_ZERO_CHUNKS);
+		assertZeroCountCheck(hasher, createTestFile(ONE_CHUNK, 0), NO_ZERO_CHUNKS);
+		assertZeroCountCheck(hasher, createTestFile(TEN_CHUNKS, 0), NO_ZERO_CHUNKS);
+		assertZeroCountCheck(hasher, createTestFile(ONE_K_CHUNKS, 0), NO_ZERO_CHUNKS);
+		assertZeroCountCheck(hasher, createTestFile(ONE_K_OVER_CHUNKS, 0), NO_ZERO_CHUNKS);
 	}
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testZeroChunkCount(Hasher hasher, long len, int nZeroChunk, int expectedZeroChunks) throws IOException, NoSuchAlgorithmException {
-		Path path = createTestFile(len, nZeroChunk);
+	public void testZeroChunkCount(Hasher hasher) throws IOException, NoSuchAlgorithmException {
+		assertZeroCountCheck(hasher, createTestFile(EMPTY, 3), 0);
+		assertZeroCountCheck(hasher, createTestFile(ONE_CHUNK, 3), 0);
+		assertZeroCountCheck(hasher, createTestFile(TEN_CHUNKS, 3), 0);
+		assertZeroCountCheck(hasher, createTestFile(ONE_K_CHUNKS, 3), 3);
+
+		// We only expect two complete zero chunks since the initial data is offset and thus the first read zero chunk does not fully contain zeros.
+		assertZeroCountCheck(hasher, createTestFile(ONE_K_OVER_CHUNKS, 3), 2);
+	}
+
+	private void assertZeroCountCheck(Hasher hasher, Path path, int expectedZeroChunks) throws NoSuchAlgorithmException, IOException {
+		assertEquals(expectedZeroChunks, hasher.computeZeroChunkCount(path), "The hasher did not return the expected amount of zero chunks");
 		long count = new PartialFile(path).computeZeroChunkCount();
-		// time(len, "chunkHash", hasher, () -> {
-		// for (int i = 0; i < TEST_RUNS; i++) {
-		int nZeroBytes = hasher.computeZeroChunkCount(path);
-		assertEquals(count, nZeroBytes);
-		assertEquals(expectedZeroChunks, nZeroBytes != 0 ? nZeroBytes / 4096 : 0,
-			"The hasher did not return the expected amount of zero chunks");
-		// }
-		// });
+		assertEquals(expectedZeroChunks, count);
 	}
 
 }

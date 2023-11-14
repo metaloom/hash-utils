@@ -37,12 +37,9 @@
             <artifactId>guava</artifactId>
             <version>31.0.1-jre</version>
         </dependency>
-
-        <!-- Required shim to workaround the log4j dependency of util-mmap -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.32</version>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Test -->

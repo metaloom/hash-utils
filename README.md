@@ -41,13 +41,21 @@ byte[] binHash = HashUtils.computeBinSHA512(path);
 
 ## Chunk Hash
 
-The chunk hash method will only hash the first 5 MB or 5% of the provided path. This method may be used when the performance / precision tradeof is acceptable.
+The chunk hash method will only hash the first 5 MB or 5% of the provided file. This method may be used when the performance / precision tradeof is acceptable.
 
 ```java
 Path path = Paths.get("pom.xml");
 String hash = HashUtils.computeChunkHash(path);
 byte[] binHash = HashUtils.computeBinChunkHash(path);
+```
 
+## Zero Chunks
+
+The zero chunk count method computes the amount of 4k byte chunks which consists of zeros.
+
+```java
+Path path = Paths.get("pom.xml");
+int count = HashUtils.computeZeroChunkCount(path);
 ```
 
 ## Implementations
@@ -66,7 +74,7 @@ Hasher hasher = new FileChannelHasher();
 |------------------------|-------------------|-------------------------|
 | MemorySegmentHasher    | (default)         | Uses the JEP 424 foreign memory allocation API to memory map files.              
 | FileChannelHasher      | -                 | Uses a filechannel to map regions of the file to memory. This implementation only supports files which are smaller Integer.MAX_VALUE  |
-| MmapHasher             | (legacy/removed)  | Uses JNI to make use of Mmap to map file regions to direct memory.                                                                    |
+| MmapHasher             | (legacy/removed)  | Used JNI to make use of Mmap to map file regions to direct memory.                                                                    |
 
 
 ## Release Process

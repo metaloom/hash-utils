@@ -27,16 +27,19 @@ public abstract class AbstractHasherTest {
 	public static final String MINIMAL_CHUNK_HASH = "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015";
 
 	public static final int SMALL = 20;
-	public static final String SMALL_MD5 = "1cb17f857d5b4bab8268d22f376ce61c";
-	public static final String SMALL_SHA256 = "0400a7657decac81974d4e96db9fc8c84df4bb0db0fb454909ecb4b93ffd654b";
-	public static final String SMALL_SHA512 = "60285b36eac3782ac220ddd227fdd23af194783046494251a4c40d0d7445fa205fc6a32f072d4fc4e6603fcde4b521d8f93854d4acd2b13d9d1e8868cdd867ef";
-	public static final String SMALL_CHUNK_HASH = "0400a7657decac81974d4e96db9fc8c84df4bb0db0fb454909ecb4b93ffd654b";
+	public static final String SMALL_MD5 = "2e5892bbb905119aae6dfd3365bd90e5";
+	public static final String SMALL_SHA256 = "0214f8ff8f7361495befb1e395fab0da8b29388248719b3fb03de39e3ad8f0f0";
+	public static final String SMALL_SHA512 = "7a323f5559552f78d9dbe6084a3c7e994e1d8c343034e3709be233822c51ec60a96e630f38f438d79b468b62d0c725bdd0042674950ca24e6dc3a57d96532012";
+	public static final String SMALL_CHUNK_HASH = "0214f8ff8f7361495befb1e395fab0da8b29388248719b3fb03de39e3ad8f0f0";
 
-	public static final int LARGE = 1024 * 1024 * 200;
-	public static final String LARGE_MD5 = "4ffb188aec3a9596d49d7ad307d2c47d";
-	public static final String LARGE_SHA256 = "1cf6b3be283d1022c26426d4f5d13f5303d044126cd76c5fa0e834d837bdb0ca";
-	public static final String LARGE_SHA512 = "32698caf5f32c2e4d6b7ad4ca851e0f5e130bf054231eaa7345a27c31776ffb039f2a0070a78cca0ff82b7bb6303fdaa0aa2bce580101c7eadf9bae6adf6e29c";
-	public static final String LARGE_CHUNK_HASH = "5449ecf9b06ad82bf75a0f1de67f1d8b40142c416dc93039c84a3ae6a98bb2cb";
+	public static final int LARGE = 1024 * 1024 * 200; // 1MB + 200bytes
+	public static final String LARGE_MD5 = "640c25f033f345cd7bf6d0610a2495df";
+	public static final String LARGE_SHA256 = "504e8fd570a2bb5c761721084325c99308b49a7ad9a04abb08e9ff3dd4480076";
+	public static final String LARGE_SHA512 = "89b00a8dbc605d105b13a18d45f69f040212c1bdfb1bb99db5b565a6852e60d1b2b70a7216f4082715f3e00bcc8caf4d6d6f62ba2cce39e3281f549e755cec93";
+	public static final String LARGE_CHUNK_HASH = "100673eb17f1299baa15a606947144eeb5b031a55c6e80f01ba6feaf35a46011";
+
+	public static final long VERY_LARGE = 6L * 1024L * 1024L * 1024L + 128L; // 6 GB
+	public static final String VERY_LARGE_SHA512 = "0880956965eb338f58569f411ebb69530c2e1eb17571c9ef7a96e2c4b7590a2c8b73a9ca5a538d4d063a5fa2215baf604e8bd45cc70fb067a870130abff46ef3";
 
 	protected Path createTestFile(long nRandomBytes, int zeroChunkCount) {
 		try {
@@ -58,12 +61,10 @@ public abstract class AbstractHasherTest {
 					fos.write(chunk);
 				}
 
-				for (int nChunk = 0; nChunk <= zeroChunkCount; nChunk++) {
+				for (int nChunk = 0; nChunk < zeroChunkCount; nChunk++) {
 					byte[] chunk = zeroChunk(chunkSize);
 					fos.write(chunk);
 				}
-
-				// fos.write(randomBytes(1024));
 			}
 			return file.toPath();
 		} catch (IOException e) {
@@ -91,9 +92,14 @@ public abstract class AbstractHasherTest {
 			if (file.exists()) {
 				return file.toPath();
 			}
+			String pattern = "X";
+			if (size > 16) {
+				size = size / 16;
+				pattern = "ABCDEFGHABCDEFGH";
+			}
 			try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 				for (long i = 0; i < size; i++) {
-					writer.append("X");
+					writer.append(pattern);
 				}
 			}
 			return file.toPath();

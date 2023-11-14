@@ -5,20 +5,24 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout.OfByte;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.metaloom.utils.hash.HashUtils;
 
 public class PartialFile {
 
+	public static final Logger log = LoggerFactory.getLogger(PartialFile.class);
+
 	private final File file;
 	private long size;
-	private long zeroByteSize = -1;
+	private long nZeroChunks = -1;
 	private List<SegmentHash> segmentHashes = new ArrayList<>();
 
 	public final int CHUNK_SIZE = 4096;
@@ -33,32 +37,20 @@ public class PartialFile {
 	}
 
 	public long computeZeroChunkCount(int chunkSize) throws NoSuchAlgorithmException, IOException {
-		if (zeroByteSize != -1) {
-			return zeroByteSize;
+		// Return the cached result
+		if (nZeroChunks != -1) {
+			return nZeroChunks;
 		}
 
-		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
-			FileChannel channel = rafile.getChannel();
-			long len = channel.size();
-			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, Arena.ofConfined());
-			long start = 1 * 1024 * chunkSize; // 4 MB
-			zeroByteSize=0;
-			while (start < len) {
-				long remaining = len - start;
-				int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
-				MemorySegment slice = seg.asSlice(start, bufferSize);
-				byte[] chunk = slice.toArray(OfByte.JAVA_BYTE);
-				if (HashUtils.isZeroChunk(chunk)) {
-					zeroByteSize += chunkSize;
-				}
-				start += bufferSize;
-			}
-		}
-		if (zeroByteSize == -1) {
-			zeroByteSize = 0;
+		try {
+			nZeroChunks = HashUtils.computeZeroChunkCount(file.toPath());
+		} catch (Exception e) {
+			log.error("Failed to compute zero chunk count", e);
+			// In case of error we return 0
+			nZeroChunks = 0;
 		}
 
-		return zeroByteSize;
+		return nZeroChunks;
 	}
 
 	public List<SegmentHash> computeHashes() throws NoSuchAlgorithmException, IOException {
@@ -68,20 +60,22 @@ public class PartialFile {
 
 		long size = file.length();
 		if (size < 10 * 1024 * 1024) {
-			System.out.println("File smaller than 10MB");
+			if (log.isWarnEnabled()) {
+				log.warn("File smaller than 10MB");
+			}
 			return segmentHashes;
 		}
 
 		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
-			FileChannel fileChannel = rafile.getChannel();
+			FileChannel channel = rafile.getChannel();
 
-			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
+			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size(), Arena.ofConfined());
 
 			long start = 1 * 1024 * CHUNK_SIZE; // 4 MB
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
 				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
 				byte[] chunk = slice.asByteBuffer().array();
-				if (!HashUtils.isZeroChunk(chunk)) {
+				if (!HashUtils.isFullZeroChunk(chunk)) {
 					// We were previously in zero area. This means a new chunk starts
 					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));
 					segmentHashes.add(sh);
@@ -137,7 +131,9 @@ public class PartialFile {
 				}
 			}
 
-			System.out.println("Matches: " + score + " out of " + computeHashes().size());
+			if (log.isDebugEnabled()) {
+				log.debug("Matches: " + score + " out of " + computeHashes().size());
+			}
 			return (double) score / (double) computeHashes().size();
 
 		}

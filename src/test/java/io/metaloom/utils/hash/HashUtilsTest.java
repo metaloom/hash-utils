@@ -38,7 +38,7 @@ public class HashUtilsTest extends AbstractHasherTest {
 		Path path = createTestFile(len);
 		// time(len,"md5", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(md5, hasher.computeMD5(path));
+			assertEquals(md5, hasher.computeMD5(path), "Hashsum mismatch for " + path);
 		}
 		// });
 		assertEquals(md5, bytesToHex(hasher.computeBinMD5(path.toFile())));
@@ -52,7 +52,7 @@ public class HashUtilsTest extends AbstractHasherTest {
 		Path path = createTestFile(len);
 		// time(len, "sha256", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(sha256, hasher.computeSHA256(path));
+			assertEquals(sha256, hasher.computeSHA256(path), "Hashsum mismatch for " + path);
 		}
 		// });
 		assertEquals(sha256, bytesToHex(hasher.computeBinSHA256(path.toFile())));
@@ -66,7 +66,7 @@ public class HashUtilsTest extends AbstractHasherTest {
 		Path path = createTestFile(len);
 		time(len, "sha512", hasher, () -> {
 			for (int i = 0; i < TEST_RUNS; i++) {
-				assertEquals(sha512, hasher.computeSHA512(path));
+				assertEquals(sha512, hasher.computeSHA512(path), "Hashsum mismatch for " + path);
 			}
 		});
 		assertEquals(sha512, bytesToHex(hasher.computeBinSHA512(path.toFile())));
@@ -80,14 +80,12 @@ public class HashUtilsTest extends AbstractHasherTest {
 		Path path = createTestFile(len);
 		// time(len, "chunkHash", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {
-			assertEquals(chunkHash, hasher.computeChunkHash(path));
+			assertEquals(chunkHash, hasher.computeChunkHash(path), "Hashsum mismatch for " + path);
 		}
 		// });
 		assertEquals(chunkHash, bytesToHex(hasher.computeBinChunkHash(path.toFile())));
 		assertEquals(chunkHash, bytesToHex(hasher.computeBinChunkHash(path)));
 		assertEquals(chunkHash, hasher.computeChunkHash(path.toFile()));
 	}
-
-
 
 }

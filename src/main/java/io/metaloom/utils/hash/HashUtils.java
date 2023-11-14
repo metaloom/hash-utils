@@ -11,6 +11,8 @@ public final class HashUtils {
 
 	private static Hasher DEFAULT_HASHER = DefaultHasher.getHasher();
 
+	public static final int DEFAULT_ZERO_CHUNK_SIZE = 4096;
+
 	protected HashUtils() {
 	}
 
@@ -70,7 +72,6 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeZeroChunkCount(path);
 	}
 
-	
 	/**
 	 * Convert the byte array to a hex formatted string.
 	 * 
@@ -102,9 +103,17 @@ public final class HashUtils {
 		}
 		return data;
 	}
-	
-	
-	public static boolean isZeroChunk(byte[] chunk) {
+
+	/**
+	 * Check if the provided data consists of zeros.
+	 * 
+	 * @param chunk
+	 * @return
+	 */
+	public static boolean isFullZeroChunk(byte[] chunk) {
+		if (chunk.length != DEFAULT_ZERO_CHUNK_SIZE) {
+			return false;
+		}
 		for (int i = 0; i < chunk.length; i++) {
 			if (chunk[i] != 0) {
 				return false;
@@ -112,6 +121,5 @@ public final class HashUtils {
 		}
 		return true;
 	}
-
 
 }

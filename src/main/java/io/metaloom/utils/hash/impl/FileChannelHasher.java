@@ -49,14 +49,11 @@ public class FileChannelHasher extends AbstractHasher {
 	}
 
 	@Override
-	public void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkReader) throws IOException {
-		long len = channel.size();
+	public void readChunks(FileChannel channel, long start, long len , int chunkSize, Consumer<byte[]> chunkReader) throws IOException {
 		MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, len);
-		long start = 1 * 1024 * chunkSize; // 4 MB
 		while (start < len) {
 			long remaining = len - start;
 			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
-			System.out.println(bufferSize);
 			byte[] dst = new byte[bufferSize];
 			buffer.get((int) start, dst, 0, bufferSize);
 			chunkReader.accept(dst);

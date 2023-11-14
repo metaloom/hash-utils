@@ -10,9 +10,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractHasher implements Hasher {
 
-	public final int DEFAULT_ZERO_CHUNK_SIZE = 4096;
+	private static Logger log = LoggerFactory.getLogger(AbstractHasher.class);
 
 	public static MessageDigest md5;
 	public static MessageDigest md256;
@@ -80,21 +83,22 @@ public abstract class AbstractHasher implements Hasher {
 
 	@Override
 	public int computeZeroChunkCount(Path path) throws IOException {
-		AtomicInteger zeroByteSize = new AtomicInteger(0);
-		AtomicInteger nChunk = new AtomicInteger(0);
-		System.out.println();
+		final int chunkSize = HashUtils.DEFAULT_ZERO_CHUNK_SIZE;
+		AtomicInteger nZeroChunks = new AtomicInteger(0);
 		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
-			FileChannel fileChannel = rafile.getChannel();
-			final int chunkSize = DEFAULT_ZERO_CHUNK_SIZE;
-			readChunks(fileChannel, chunkSize, chunk -> {
-				if (HashUtils.isZeroChunk(chunk)) {
-					zeroByteSize.set(zeroByteSize.get() + chunkSize);
+			FileChannel channel = rafile.getChannel();
+			long start = 1 * 1024 * chunkSize; // 4 MB
+			long len = channel.size();
+			readChunks(channel, start, len, chunkSize, chunk -> {
+				if (HashUtils.isFullZeroChunk(chunk)) {
+					if (log.isTraceEnabled()) {
+						log.trace("Found zero chunk");
+					}
+					nZeroChunks.incrementAndGet();
 				}
-				System.out.println("Chunk: " + nChunk.incrementAndGet() +  " "  + HashUtils.isZeroChunk(chunk));
 			});
 		}
-
-		return zeroByteSize.get();
+		return nZeroChunks.get();
 	}
 
 	private String getHash(MessageDigest md) {
@@ -110,7 +114,7 @@ public abstract class AbstractHasher implements Hasher {
 	public abstract byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
 
 	@Override
-	public abstract void readChunks(FileChannel channel, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
+	public abstract void readChunks(FileChannel channel, long start, long len, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
 
 	@Override
 	public String toString() {

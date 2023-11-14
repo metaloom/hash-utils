@@ -4,4 +4,5 @@ module hash_utils {
 	exports io.metaloom.utils.hash;
 
 	requires java.management;
+	requires transitive org.slf4j;
 }

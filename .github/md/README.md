@@ -35,11 +35,18 @@ This project contains utilities to hash files with SHA256/SHA512.
 
 ## Chunk Hash
 
-The chunk hash method will only hash the first 5 MB or 5% of the provided path. This method may be used when the performance / precision tradeof is acceptable.
+The chunk hash method will only hash the first 5 MB or 5% of the provided file. This method may be used when the performance / precision tradeof is acceptable.
 
 ```java
 %{snippet|id=chunk.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
+```
 
+## Zero Chunks
+
+The zero chunk count method computes the amount of 4k byte chunks which consists of zeros.
+
+```java
+%{snippet|id=zero.example|file=src/test/java/io/metaloom/utils/hash/UsageExampleTest.java}
 ```
 
 ## Implementations
