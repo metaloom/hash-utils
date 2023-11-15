@@ -74,7 +74,7 @@ Hasher hasher = new FileChannelHasher();
 |------------------------|-------------------|-------------------------|
 | MemorySegmentHasher    | (default)         | Uses the JEP 424 foreign memory allocation API to memory map files.              
 | FileChannelHasher      | -                 | Uses a filechannel to map regions of the file to memory. This implementation only supports files which are smaller Integer.MAX_VALUE  |
-| MmapHasher             | (legacy/removed)  | Used JNI to make use of Mmap to map file regions to direct memory.                                                                    |
+| MmapHasher             | (legacy/removed)  | Uses JNI to make use of Mmap to map file regions to direct memory.                                                                    |
 
 
 ## Release Process
