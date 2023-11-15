@@ -14,7 +14,7 @@ You can enable preview features via `--enable-preview` vm / compiler argument.
 <dependency>
   <groupId>io.metaloom.utils</groupId>
   <artifactId>hash-utils</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
