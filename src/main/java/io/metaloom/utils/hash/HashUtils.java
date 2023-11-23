@@ -122,4 +122,8 @@ public final class HashUtils {
 		return true;
 	}
 
+	public static Path segmentPath(Path basePath, SHA512 hash) {
+		String prefix = hash.toString().substring(0, 4);
+		return basePath.resolve(prefix);
+	}
 }
