@@ -34,7 +34,7 @@ public class HasherTest extends AbstractHasherTest {
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testHashMD5(Hasher hasher, long len, String md5, String sha256, String sha512, String chunkHash) {
+	public void testHashMD5(Hasher hasher, long len, MD5 md5, SHA256 sha256, SHA512 sha512, ChunkHash chunkHash) {
 		Path path = createTestFile(len);
 		// time(len,"md5", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {
@@ -48,7 +48,7 @@ public class HasherTest extends AbstractHasherTest {
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testHash256(Hasher hasher, long len, String md5, String sha256, String sha512, String chunkHash) {
+	public void testHash256(Hasher hasher, long len, MD5 md5, SHA256 sha256, SHA512 sha512, ChunkHash chunkHash) {
 		Path path = createTestFile(len);
 		// time(len, "sha256", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {
@@ -62,7 +62,7 @@ public class HasherTest extends AbstractHasherTest {
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testHash512(Hasher hasher, long len, String md5, String sha256, String sha512, String chunkHash) {
+	public void testHash512(Hasher hasher, long len, MD5 md5, SHA256 sha256, SHA512 sha512, ChunkHash chunkHash) {
 		Path path = createTestFile(len);
 		time(len, "sha512", hasher, () -> {
 			for (int i = 0; i < TEST_RUNS; i++) {
@@ -76,7 +76,7 @@ public class HasherTest extends AbstractHasherTest {
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testChunkHash(Hasher hasher, long len, String md5, String sha256, String sha512, String chunkHash) {
+	public void testChunkHash(Hasher hasher, long len, MD5 md5, SHA256 sha256, SHA512 sha512, ChunkHash chunkHash) {
 		Path path = createTestFile(len);
 		// time(len, "chunkHash", hasher, () -> {
 		for (int i = 0; i < TEST_RUNS; i++) {

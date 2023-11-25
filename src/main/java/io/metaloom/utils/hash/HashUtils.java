@@ -3,7 +3,6 @@ package io.metaloom.utils.hash;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 
 public final class HashUtils {
 
@@ -16,11 +15,12 @@ public final class HashUtils {
 	protected HashUtils() {
 	}
 
-	public static String computeChunkHash(File file) {
-		return DEFAULT_HASHER.computeChunkHash(file.toPath());
+	// Chunk
+	public static ChunkHash computeChunkHash(File file) {
+		return computeChunkHash(file.toPath());
 	}
 
-	public static String computeChunkHash(Path path) {
+	public static ChunkHash computeChunkHash(Path path) {
 		return DEFAULT_HASHER.computeChunkHash(path);
 	}
 
@@ -28,15 +28,13 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeBinChunkHash(path);
 	}
 
-	public static String computeMD5Hash(byte[] chunk) throws NoSuchAlgorithmException {
-		return DEFAULT_HASHER.computeMD5(chunk);
+	// SHA256
+
+	public static SHA256 computeSHA256(File file) {
+		return computeSHA256(file.toPath());
 	}
 
-	public static String computeSHA256(File file) {
-		return DEFAULT_HASHER.computeSHA256(file.toPath());
-	}
-
-	public static String computeSHA256(Path path) {
+	public static SHA256 computeSHA256(Path path) {
 		return DEFAULT_HASHER.computeSHA256(path);
 	}
 
@@ -44,11 +42,13 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeBinSHA256(path);
 	}
 
-	public static String computeSHA512(File file) {
-		return DEFAULT_HASHER.computeSHA512(file.toPath());
+	// SHA512
+
+	public static SHA512 computeSHA512(File file) {
+		return computeSHA512(file.toPath());
 	}
 
-	public static String computeSHA512(Path path) {
+	public static SHA512 computeSHA512(Path path) {
 		return DEFAULT_HASHER.computeSHA512(path);
 	}
 
@@ -56,17 +56,25 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeBinSHA512(path);
 	}
 
-	public static String computeMD5(Path path) {
+	// MD5
+
+	public static MD5 computeMD5(File file) {
+		return computeMD5(file.toPath());
+	}
+
+	public static MD5 computeMD5(Path path) {
 		return DEFAULT_HASHER.computeMD5(path);
+	}
+
+	public static MD5 computeMD5(byte[] data) {
+		return DEFAULT_HASHER.computeMD5(data);
 	}
 
 	public static byte[] computeBinMD5(Path path) {
 		return DEFAULT_HASHER.computeBinMD5(path);
 	}
 
-	public static String computeMD5(byte[] data) {
-		return DEFAULT_HASHER.computeMD5(data);
-	}
+	// Zero Count
 
 	public static int computeZeroChunkCount(Path path) throws IOException {
 		return DEFAULT_HASHER.computeZeroChunkCount(path);
@@ -86,6 +94,11 @@ public final class HashUtils {
 			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
 		return new String(hexChars);
+
+		/*
+		 * StringBuilder sb = new StringBuilder(2 * hashBytes.length); for (byte b : hashBytes) { sb.append(String.format("%02x", b & 0xff)); } return
+		 * sb.toString();
+		 */
 	}
 
 	/**

@@ -4,7 +4,6 @@ import static io.metaloom.utils.hash.HashUtils.bytesToHex;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -23,7 +22,7 @@ public interface Hasher {
 	 * @param file
 	 * @return
 	 */
-	default String computeChunkHash(File file) {
+	default ChunkHash computeChunkHash(File file) {
 		return computeChunkHash(file.toPath());
 	}
 
@@ -34,8 +33,8 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	default String computeChunkHash(Path path) {
-		return bytesToHex(computeBinChunkHash(path));
+	default ChunkHash computeChunkHash(Path path) {
+		return ChunkHash.fromString(bytesToHex(computeBinChunkHash(path)));
 	}
 
 	/**
@@ -64,7 +63,7 @@ public interface Hasher {
 	 * @param data
 	 * @return
 	 */
-	String computeMD5(byte[] data);
+	MD5 computeMD5(byte[] data);
 
 	/**
 	 * Compute the MD5 checksum.
@@ -72,7 +71,7 @@ public interface Hasher {
 	 * @param file
 	 * @return
 	 */
-	default String computeMD5(File file) {
+	default MD5 computeMD5(File file) {
 		return computeMD5(file.toPath());
 	}
 
@@ -82,8 +81,8 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	default String computeMD5(Path path) {
-		return bytesToHex(computeBinMD5(path));
+	default MD5 computeMD5(Path path) {
+		return MD5.fromString(bytesToHex(computeBinMD5(path)));
 	}
 
 	/**
@@ -110,7 +109,7 @@ public interface Hasher {
 	 * @param file
 	 * @return
 	 */
-	default String computeSHA256(File file) {
+	default SHA256 computeSHA256(File file) {
 		return computeSHA256(file.toPath());
 	}
 
@@ -130,8 +129,8 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	default String computeSHA256(Path path) {
-		return bytesToHex(computeBinSHA256(path));
+	default SHA256 computeSHA256(Path path) {
+		return SHA256.fromString(bytesToHex(computeBinSHA256(path)));
 	}
 
 	/**
@@ -148,7 +147,7 @@ public interface Hasher {
 	 * @param file
 	 * @return
 	 */
-	default String computeSHA512(File file) {
+	default SHA512 computeSHA512(File file) {
 		return computeSHA512(file.toPath());
 	}
 
@@ -158,8 +157,8 @@ public interface Hasher {
 	 * @param path
 	 * @return
 	 */
-	default String computeSHA512(Path path) {
-		return bytesToHex(computeBinSHA512(path));
+	default SHA512 computeSHA512(Path path) {
+		return SHA512.fromString(bytesToHex(computeBinSHA512(path)));
 	}
 
 	/**

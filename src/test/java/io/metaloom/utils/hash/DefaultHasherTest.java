@@ -13,9 +13,9 @@ public class DefaultHasherTest extends AbstractHasherTest {
 	public void testBasics() {
 		Path file = createTestFile(LARGE);
 		Hasher hasher = DefaultHasher.getHasher();
-		String h1 = hasher.computeSHA512(file);
+		SHA512 h1 = hasher.computeSHA512(file);
 		assertEquals(LARGE_SHA512, h1);
-		String h2 = HashUtils.computeSHA512(file);
+		SHA512 h2 = HashUtils.computeSHA512(file);
 		assertEquals(h1, h2);
 	}
 
@@ -23,21 +23,19 @@ public class DefaultHasherTest extends AbstractHasherTest {
 	public void testVeryLargeFile() {
 		Path file = createTestFile(VERY_LARGE);
 		Hasher hasher = DefaultHasher.getHasher();
-		String h1 = hasher.computeSHA512(file);
-		assertEquals(VERY_LARGE_SHA512, h1);
+		SHA512 h1 = hasher.computeSHA512(file);
+		assertEquals(VERY_LARGE_SHA512, h1.toString());
 	}
 
 	@Test
 	public void testHash512RandomFile() {
-		// time(len, "chunkHash", hasher, () -> {
 		int len = LARGE;
 		for (int i = 0; i < 10; i++) {
 			Path path = createTestFile(len++, 0);
 			Hasher hasher = DefaultHasher.getHasher();
-			String hash = hasher.computeSHA512(path);
+			SHA512 hash = hasher.computeSHA512(path);
 			assertNotNull(hash);
 		}
-		// });
 	}
 
 }

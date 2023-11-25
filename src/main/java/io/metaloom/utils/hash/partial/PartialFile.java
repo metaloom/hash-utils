@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.metaloom.utils.hash.HashUtils;
+import io.metaloom.utils.hash.MD5;
 
 public class PartialFile {
 
@@ -125,8 +126,8 @@ public class PartialFile {
 				long start = hash.getStart();
 				MemorySegment slice = seg.asSlice(start, hash.getLen());
 				byte[] dst = slice.asByteBuffer().array();
-				String newHash = HashUtils.computeMD5(dst);
-				if (newHash.equals(hash.getHash())) {
+				MD5 newHash = HashUtils.computeMD5(dst);
+				if (newHash.toString().equals(hash.getHash())) {
 					score++;
 				}
 			}

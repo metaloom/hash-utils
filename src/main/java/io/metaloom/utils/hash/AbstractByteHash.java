@@ -2,19 +2,19 @@ package io.metaloom.utils.hash;
 
 import java.io.Serializable;
 
-public abstract class AbstractStringHash<T> implements Comparable<T>, Serializable {
+public abstract class AbstractByteHash<T> implements Comparable<T>, Serializable {
 
-	private final String hash;
+	private final byte[] hash;
 	private final int len;
-
-	public AbstractStringHash(String hash, int len) {
+	
+	public AbstractByteHash(byte[] hash, int len) {
 		this.hash = hash;
 		this.len = len;
 		validate();
 	}
 
 	private void validate() {
-		if (hash == null || hash.length() != len) {
+		if (hash == null || hash.length != len) {
 			throw new RuntimeException("Invalid hash len detected");
 		}
 	}
@@ -26,7 +26,7 @@ public abstract class AbstractStringHash<T> implements Comparable<T>, Serializab
 
 	@Override
 	public boolean equals(Object obj) {
-		return hash.equals(obj.toString());
+		return toString().equals(obj.toString());
 	}
 
 	@Override
@@ -36,6 +36,6 @@ public abstract class AbstractStringHash<T> implements Comparable<T>, Serializab
 
 	@Override
 	public String toString() {
-		return hash;
+		return HashUtils.bytesToHex(hash);
 	}
 }

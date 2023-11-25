@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 public class HashUtilsTest {
+
 	public static final SHA512 HASH = SHA512.fromString(
 		"e7c22b994c59d9cf2b48e549b1e24666636045930d3da7c1acb299d1c3b7f931f94aae41edda2c2b207a36e10f8bcb8d45223e54878f5b316e7ce3b6bc019629");
 

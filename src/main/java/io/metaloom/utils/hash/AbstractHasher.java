@@ -40,9 +40,9 @@ public abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
-	public String computeMD5(byte[] data) {
+	public MD5 computeMD5(byte[] data) {
 		md5.update(data);
-		return getHash(md5);
+		return MD5.fromString(getHashAsHex(md5));
 	}
 
 	@Override
@@ -101,13 +101,9 @@ public abstract class AbstractHasher implements Hasher {
 		return nZeroChunks.get();
 	}
 
-	private String getHash(MessageDigest md) {
+	private String getHashAsHex(MessageDigest md) {
 		byte[] hashBytes = md.digest();
-		StringBuilder sb = new StringBuilder(2 * hashBytes.length);
-		for (byte b : hashBytes) {
-			sb.append(String.format("%02x", b & 0xff));
-		}
-		return sb.toString();
+		return HashUtils.bytesToHex(hashBytes);
 	}
 
 	@Override

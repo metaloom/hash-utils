@@ -15,7 +15,7 @@ public class UsageExampleTest {
 	public void testMD5Usage() {
 		// SNIPPET START md5.example
 		Path path = Paths.get("pom.xml");
-		String hash = HashUtils.computeMD5(path);
+		MD5 hash = HashUtils.computeMD5(path);
 		byte[] binHash = HashUtils.computeBinMD5(path);
 		// SNIPPET END md5.example
 
@@ -26,7 +26,7 @@ public class UsageExampleTest {
 	public void testSHA256Usage() {
 		// SNIPPET START sha256.example
 		Path path = Paths.get("pom.xml");
-		String hash = HashUtils.computeSHA256(path);
+		SHA256 hash = HashUtils.computeSHA256(path);
 		byte[] binHash = HashUtils.computeBinSHA256(path);
 		// SNIPPET END sha256.example
 		assertNotNull(hash);
@@ -36,7 +36,7 @@ public class UsageExampleTest {
 	public void testSHA512Usage() {
 		// SNIPPET START sha512.example
 		Path path = Paths.get("pom.xml");
-		String hash = HashUtils.computeSHA512(path);
+		SHA512 hash = HashUtils.computeSHA512(path);
 		byte[] binHash = HashUtils.computeBinSHA512(path);
 		// SNIPPET END sha512.example
 		assertNotNull(hash);
@@ -47,7 +47,7 @@ public class UsageExampleTest {
 	public void testChunkHashUsage() {
 		// SNIPPET START chunk.example
 		Path path = Paths.get("pom.xml");
-		String hash = HashUtils.computeChunkHash(path);
+		ChunkHash hash = HashUtils.computeChunkHash(path);
 		byte[] binHash = HashUtils.computeBinChunkHash(path);
 		// SNIPPET END chunk.example
 		assertNotNull(hash);
