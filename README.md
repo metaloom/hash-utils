@@ -24,7 +24,7 @@ You can enable preview features via `--enable-preview` vm / compiler argument.
 
 ```java
 Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeMD5(path);
+MD5 hash = HashUtils.computeMD5(path);
 byte[] binHash = HashUtils.computeBinMD5(path);
 ```
 
@@ -32,7 +32,7 @@ byte[] binHash = HashUtils.computeBinMD5(path);
 
 ```java
 Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeSHA256(path);
+SHA256 hash = HashUtils.computeSHA256(path);
 byte[] binHash = HashUtils.computeBinSHA256(path);
 ```
 
@@ -40,7 +40,7 @@ byte[] binHash = HashUtils.computeBinSHA256(path);
 
 ```java
 Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeSHA512(path);
+SHA512 hash = HashUtils.computeSHA512(path);
 byte[] binHash = HashUtils.computeBinSHA512(path);
 ```
 
@@ -50,7 +50,7 @@ The chunk hash method will only hash the first 5 MB or 5% of the provided file. 
 
 ```java
 Path path = Paths.get("pom.xml");
-String hash = HashUtils.computeChunkHash(path);
+ChunkHash hash = HashUtils.computeChunkHash(path);
 byte[] binHash = HashUtils.computeBinChunkHash(path);
 ```
 
