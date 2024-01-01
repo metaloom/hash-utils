@@ -1,5 +1,8 @@
 package io.metaloom.utils.hash;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 public class MD5 extends AbstractStringHash<MD5> {
 
 	private static final long serialVersionUID = 7488509115689279385L;
@@ -13,5 +16,10 @@ public class MD5 extends AbstractStringHash<MD5> {
 			return null;
 		}
 		return new MD5(hash);
+	}
+
+	public static MD5 fromBuffer(ByteBuffer b) {
+		String hash = new String(b.array(), Charset.defaultCharset());
+		return fromString(hash);
 	}
 }

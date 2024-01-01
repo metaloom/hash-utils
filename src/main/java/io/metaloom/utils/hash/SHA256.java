@@ -1,5 +1,8 @@
 package io.metaloom.utils.hash;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 public class SHA256 extends AbstractStringHash<SHA256> {
 
 	private static final long serialVersionUID = -7411099443567585090L;
@@ -13,6 +16,11 @@ public class SHA256 extends AbstractStringHash<SHA256> {
 			return null;
 		}
 		return new SHA256(hash);
+	}
+
+	public static SHA256 fromBuffer(ByteBuffer b) {
+		String hash = new String(b.array(), Charset.defaultCharset());
+		return fromString(hash);
 	}
 
 }

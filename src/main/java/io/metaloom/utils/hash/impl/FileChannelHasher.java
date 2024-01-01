@@ -6,7 +6,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.metaloom.utils.hash.AbstractHasher;
@@ -47,14 +46,16 @@ public class FileChannelHasher extends AbstractHasher {
 	}
 
 	@Override
-	public void readChunks(FileChannel channel, long start, long len , int chunkSize, Consumer<byte[]> chunkReader) throws IOException {
+	public void readChunks(FileChannel channel, long start, long len , int chunkSize, Function<byte[], Boolean> chunkReader) throws IOException {
 		MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, len);
 		while (start < len) {
 			long remaining = len - start;
 			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
 			byte[] dst = new byte[bufferSize];
 			buffer.get((int) start, dst, 0, bufferSize);
-			chunkReader.accept(dst);
+			if(!chunkReader.apply(dst)) {
+				break;
+			}
 			start += bufferSize;
 		}
 

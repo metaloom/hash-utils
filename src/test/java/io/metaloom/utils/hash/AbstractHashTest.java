@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractHashTest<T extends Comparable<T>> {
@@ -39,6 +43,26 @@ public abstract class AbstractHashTest<T extends Comparable<T>> {
 
 		T h3 = fromString(hashB());
 		assertFalse(h1.equals(h3));
+	}
+
+	@Test
+	public void testObjectEquals() {
+		T h1 = fromString(hashA());
+		T h2 = fromString(hashA());
+		assertTrue(Objects.equals(h1, h2));
+	}
+
+	@Test
+	public void testMapContains() {
+		T h1 = fromString(hashA());
+		T h2 = fromString(hashA());
+		Map<T, T> map = new HashMap<>();
+		map.put(h1, h1);
+		assertTrue(map.containsKey(h1));
+		assertTrue(map.containsKey(h2));
+
+		assertTrue(map.containsValue(h1));
+		assertTrue(map.containsValue(h2));
 	}
 
 	@Test

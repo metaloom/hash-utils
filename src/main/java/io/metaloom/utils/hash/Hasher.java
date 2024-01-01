@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -179,13 +178,19 @@ public interface Hasher {
 	 */
 	byte[] computeBinSHA512(Path path);
 
+	default int computeZeroChunkCount(Path path) throws IOException {
+		return computeZeroChunkCount(path, 0);
+	}
+
 	/**
-	 * Compute the amount of zero byte chunks (4kb) that could be found in the given file.
+	 * Compute the amount of zero byte chunks (4kb) that could be found in the given file. The computation will be stopped when the limit of zero chunk has been
+	 * reached. This can be used to speedup the processing.
 	 * 
 	 * @param path
+	 * @param limit
 	 * @return
 	 */
-	int computeZeroChunkCount(Path path) throws IOException;
+	int computeZeroChunkCount(Path path, int limit) throws IOException;
 
 	/**
 	 * Hash implementation to be used to process the file.
@@ -212,8 +217,8 @@ public interface Hasher {
 	 * @param chunkSize
 	 *            Size of the chunks being read in bytes
 	 * @param chunkData
-	 *            Consumer which can process each chunk
+	 *            Function which can process each chunk. Return true to process the next chunk. Otherwise the process will be stopped.
 	 */
-	void readChunks(FileChannel channel, long start, long len, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
+	void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<byte[], Boolean> chunkData) throws IOException;
 
 }

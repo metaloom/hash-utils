@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -82,7 +81,7 @@ public abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
-	public int computeZeroChunkCount(Path path) throws IOException {
+	public int computeZeroChunkCount(Path path, int limit) throws IOException {
 		final int chunkSize = HashUtils.DEFAULT_ZERO_CHUNK_SIZE;
 		AtomicInteger nZeroChunks = new AtomicInteger(0);
 		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
@@ -94,8 +93,12 @@ public abstract class AbstractHasher implements Hasher {
 					if (log.isTraceEnabled()) {
 						log.trace("Found zero chunk");
 					}
-					nZeroChunks.incrementAndGet();
+					int current = nZeroChunks.incrementAndGet();
+					if (limit > 0 && current >= limit) {
+						return false;
+					}
 				}
+				return true;
 			});
 		}
 		return nZeroChunks.get();
@@ -110,7 +113,7 @@ public abstract class AbstractHasher implements Hasher {
 	public abstract byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
 
 	@Override
-	public abstract void readChunks(FileChannel channel, long start, long len, int chunkSize, Consumer<byte[]> chunkData) throws IOException;
+	public abstract void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<byte[], Boolean> chunkData) throws IOException;
 
 	@Override
 	public String toString() {

@@ -80,6 +80,10 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeZeroChunkCount(path);
 	}
 
+	public static int computeZeroChunkCount(Path path, int limit) throws IOException {
+		return DEFAULT_HASHER.computeZeroChunkCount(path, limit);
+	}
+
 	/**
 	 * Convert the byte array to a hex formatted string.
 	 * 
