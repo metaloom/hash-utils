@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout.OfByte;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -76,8 +76,9 @@ public class PartialFile {
 			long start = 1 * 1024 * CHUNK_SIZE; // 4 MB
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
 				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
-				byte[] chunk = slice.toArray(OfByte.JAVA_BYTE);
+				ByteBuffer chunk = slice.asByteBuffer();
 				if (!HashUtils.isFullZeroChunk(chunk)) {
+					chunk.position(0);
 					// We were previously in zero area. This means a new chunk starts
 					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));
 					segmentHashes.add(sh);
@@ -126,8 +127,8 @@ public class PartialFile {
 			for (SegmentHash hash : computeHashes()) {
 				long start = hash.getStart();
 				MemorySegment slice = seg.asSlice(start, hash.getLen());
-				byte[] dst = slice.toArray(OfByte.JAVA_BYTE);
-				MD5 newHash = HashUtils.computeMD5(dst);
+				ByteBuffer chunk = slice.asByteBuffer();
+				MD5 newHash = HashUtils.computeMD5(chunk);
 				if (newHash.equals(hash.getHash())) {
 					score++;
 				}

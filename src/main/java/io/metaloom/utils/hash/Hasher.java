@@ -4,6 +4,7 @@ import static io.metaloom.utils.hash.HashUtils.bytesToHex;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -62,7 +63,17 @@ public interface Hasher {
 	 * @param data
 	 * @return
 	 */
-	MD5 computeMD5(byte[] data);
+	default MD5 computeMD5(byte[] data) {
+		return computeMD5(ByteBuffer.wrap(data));
+	}
+
+	/**
+	 * Compute the MD5 checksum of the data from the buffer.
+	 * 
+	 * @param buffer
+	 * @return
+	 */
+	MD5 computeMD5(ByteBuffer buffer);
 
 	/**
 	 * Compute the MD5 checksum.
@@ -219,6 +230,6 @@ public interface Hasher {
 	 * @param chunkData
 	 *            Function which can process each chunk. Return true to process the next chunk. Otherwise the process will be stopped.
 	 */
-	void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<byte[], Boolean> chunkData) throws IOException;
+	void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<ByteBuffer, Boolean> chunkData) throws IOException;
 
 }

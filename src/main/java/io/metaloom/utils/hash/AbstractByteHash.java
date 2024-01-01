@@ -6,7 +6,7 @@ public abstract class AbstractByteHash<T> implements Comparable<T>, Serializable
 
 	private final byte[] hash;
 	private final int len;
-	
+
 	public AbstractByteHash(byte[] hash, int len) {
 		this.hash = hash;
 		this.len = len;
@@ -21,7 +21,7 @@ public abstract class AbstractByteHash<T> implements Comparable<T>, Serializable
 
 	@Override
 	public int hashCode() {
-		return hash.hashCode();
+		return toString().hashCode();
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package io.metaloom.utils.hash.impl;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -46,14 +47,15 @@ public class FileChannelHasher extends AbstractHasher {
 	}
 
 	@Override
-	public void readChunks(FileChannel channel, long start, long len , int chunkSize, Function<byte[], Boolean> chunkReader) throws IOException {
+	public void readChunks(FileChannel channel, long start, long len , int chunkSize, Function<ByteBuffer, Boolean> chunkReader) throws IOException {
 		MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, len);
 		while (start < len) {
 			long remaining = len - start;
 			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
-			byte[] dst = new byte[bufferSize];
-			buffer.get((int) start, dst, 0, bufferSize);
-			if(!chunkReader.apply(dst)) {
+//			byte[] dst = new byte[bufferSize];
+//			buffer.get((int) start, dst, 0, bufferSize);
+			ByteBuffer slice = buffer.slice((int)start, bufferSize);
+			if(!chunkReader.apply(slice)) {
 				break;
 			}
 			start += bufferSize;

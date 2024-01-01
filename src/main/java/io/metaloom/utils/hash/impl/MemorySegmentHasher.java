@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout.OfByte;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -34,14 +34,14 @@ public class MemorySegmentHasher extends AbstractHasher {
 	}
 
 	@Override
-	public void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<byte[], Boolean> chunkReader) throws IOException {
+	public void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<ByteBuffer, Boolean> chunkReader) throws IOException {
 		MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, Arena.ofConfined());
 		while (start < len) {
 			long remaining = len - start;
 			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
 			MemorySegment slice = seg.asSlice(start, bufferSize);
-			byte[] dst = slice.toArray(OfByte.JAVA_BYTE);
-			if(!chunkReader.apply(dst)) {
+			ByteBuffer buffer = slice.asByteBuffer();
+			if(!chunkReader.apply(buffer)) {
 				break;
 			}
 			start += bufferSize;

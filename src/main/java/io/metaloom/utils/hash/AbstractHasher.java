@@ -2,6 +2,7 @@ package io.metaloom.utils.hash;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -39,8 +40,8 @@ public abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
-	public MD5 computeMD5(byte[] data) {
-		md5.update(data);
+	public MD5 computeMD5(ByteBuffer buffer) {
+		md5.update(buffer);
 		return MD5.fromString(getHashAsHex(md5));
 	}
 
@@ -113,7 +114,8 @@ public abstract class AbstractHasher implements Hasher {
 	public abstract byte[] hash(Path path, MessageDigest md, Function<Long, Long> lenModifier);
 
 	@Override
-	public abstract void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<byte[], Boolean> chunkData) throws IOException;
+	public abstract void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<ByteBuffer, Boolean> chunkData)
+		throws IOException;
 
 	@Override
 	public String toString() {

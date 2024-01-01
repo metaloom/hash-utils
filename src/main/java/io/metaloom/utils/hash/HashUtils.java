@@ -2,6 +2,7 @@ package io.metaloom.utils.hash;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
 public final class HashUtils {
@@ -70,6 +71,10 @@ public final class HashUtils {
 		return DEFAULT_HASHER.computeMD5(data);
 	}
 
+	public static MD5 computeMD5(ByteBuffer buffer) {
+		return DEFAULT_HASHER.computeMD5(buffer);
+	}
+
 	public static byte[] computeBinMD5(Path path) {
 		return DEFAULT_HASHER.computeBinMD5(path);
 	}
@@ -119,6 +124,25 @@ public final class HashUtils {
 				+ Character.digit(hex.charAt(i + 1), 16));
 		}
 		return data;
+	}
+
+	/**
+	 * Check if the provided data consists of zeros.
+	 * 
+	 * @param chunk
+	 * @return
+	 */
+	public static boolean isFullZeroChunk(ByteBuffer chunk) {
+		if (chunk.remaining() != DEFAULT_ZERO_CHUNK_SIZE) {
+			return false;
+		}
+		while (chunk.hasRemaining()) {
+			if (chunk.getInt() != 0) {
+				return false;
+			}
+
+		}
+		return true;
 	}
 
 	/**
