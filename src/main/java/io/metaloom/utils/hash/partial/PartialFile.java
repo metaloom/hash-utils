@@ -77,7 +77,7 @@ public class PartialFile {
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
 				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
 				ByteBuffer chunk = slice.asByteBuffer();
-				if (!HashUtils.isFullZeroChunk(chunk)) {
+				if (!HashUtils.isFullZeroChunk(chunk, CHUNK_SIZE)) {
 					chunk.position(0);
 					// We were previously in zero area. This means a new chunk starts
 					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));

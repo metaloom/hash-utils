@@ -82,7 +82,7 @@ public final class HashUtils {
 	// Zero Count
 
 	public static int computeZeroChunkCount(Path path) throws IOException {
-		return DEFAULT_HASHER.computeZeroChunkCount(path);
+		return computeZeroChunkCount(path, 0);
 	}
 
 	public static int computeZeroChunkCount(Path path, int limit) throws IOException {
@@ -127,36 +127,40 @@ public final class HashUtils {
 	}
 
 	/**
-	 * Check if the provided data consists of zeros.
+	 * Slice the given buffer into chunks and test each one individually for zeros. Returns the total count of found zero chunks.
 	 * 
-	 * @param chunk
+	 * @param buffer
+	 * @param chunkSize
 	 * @return
 	 */
-	public static boolean isFullZeroChunk(ByteBuffer chunk) {
-		if (chunk.remaining() != DEFAULT_ZERO_CHUNK_SIZE) {
-			return false;
-		}
-		while (chunk.hasRemaining()) {
-			if (chunk.getInt() != 0) {
-				return false;
+	public static int countZeroChunks(ByteBuffer buffer, int chunkSize) {
+		int zeroChunks = 0;
+		while (buffer.remaining() >= chunkSize) {
+			ByteBuffer slice = buffer.slice(buffer.position(), chunkSize);
+			// Advance the buffer position
+			buffer.position(buffer.position() + slice.remaining());
+			if (HashUtils.isFullZeroChunk(slice, 4096)) {
+				zeroChunks++;
 			}
-
 		}
-		return true;
+		// Ignore the remaining bytes since it does not fill a full chunk
+		return zeroChunks;
 	}
 
 	/**
 	 * Check if the provided data consists of zeros.
 	 * 
 	 * @param chunk
+	 * @param chunkSize
 	 * @return
 	 */
-	public static boolean isFullZeroChunk(byte[] chunk) {
-		if (chunk.length != DEFAULT_ZERO_CHUNK_SIZE) {
+	public static boolean isFullZeroChunk(ByteBuffer chunk, int chunkSize) {
+		if (chunk.remaining() != chunkSize) {
 			return false;
 		}
-		for (int i = 0; i < chunk.length; i++) {
-			if (chunk[i] != 0) {
+		// chunk.slice(0, chunkSize);
+		while (chunk.hasRemaining()) {
+			if (chunk.get() != 0) {
 				return false;
 			}
 		}

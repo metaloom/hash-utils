@@ -2,8 +2,10 @@ package io.metaloom.utils.hash;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,5 +26,30 @@ public class HashUtilsTest {
 		Path folderPath = HashUtils.segmentPath(Paths.get("target/test"), HASH);
 		assertEquals(folderPath, dest);
 		assertFalse(Files.exists(dest));
+	}
+
+	@Test
+	public void testIsFullZeroChunk() {
+		ByteBuffer chunk = ByteBuffer.allocate(4096);
+		assertTrue(HashUtils.isFullZeroChunk(chunk, 4096));
+	}
+
+	@Test
+	public void testcountZeroChunks() {
+		ByteBuffer buffer = ByteBuffer.allocate(4096);
+		assertEquals(1, HashUtils.countZeroChunks(buffer, 4096));
+
+		buffer = ByteBuffer.allocate(8192);
+		assertEquals(2, HashUtils.countZeroChunks(buffer, 4096));
+
+		buffer = ByteBuffer.allocate(8096 + 4095);
+		assertEquals(2, HashUtils.countZeroChunks(buffer, 4096));
+	}
+
+	@Test
+	public void testIsNoFullZeroChunk() {
+		ByteBuffer chunk = ByteBuffer.allocate(4096);
+		chunk.putInt(4096 - Integer.BYTES, 255);
+		assertFalse(HashUtils.isFullZeroChunk(chunk, 4096));
 	}
 }

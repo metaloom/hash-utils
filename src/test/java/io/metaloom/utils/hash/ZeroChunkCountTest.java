@@ -61,8 +61,8 @@ public class ZeroChunkCountTest extends AbstractHasherTest {
 
 	@ParameterizedTest
 	@MethodSource("hashes")
-	public void testZEroChunkCountLimit(Hasher hasher) throws NoSuchAlgorithmException, IOException {
-		assertZeroCountCheck(hasher, createTestFile(ONE_K_CHUNKS, 3), 1, 1);
+	public void testZeroChunkCountLimit(Hasher hasher) throws NoSuchAlgorithmException, IOException {
+		assertZeroCountCheck(hasher, createTestFile(ONE_K_CHUNKS, 3), 3, 1);
 	}
 
 	private void assertZeroCountCheck(Hasher hasher, Path path, int expectedZeroChunks, int limit) throws NoSuchAlgorithmException, IOException {

@@ -89,15 +89,13 @@ public abstract class AbstractHasher implements Hasher {
 			FileChannel channel = rafile.getChannel();
 			long start = 1 * 1024 * chunkSize; // 4 MB
 			long len = channel.size();
-			readChunks(channel, start, len, chunkSize, chunk -> {
-				if (HashUtils.isFullZeroChunk(chunk)) {
-					if (log.isTraceEnabled()) {
-						log.trace("Found zero chunk");
-					}
-					int current = nZeroChunks.incrementAndGet();
-					if (limit > 0 && current >= limit) {
-						return false;
-					}
+			readChunks(channel, start, len, chunkSize * 128, buffer -> {
+				int current = nZeroChunks.addAndGet(HashUtils.countZeroChunks(buffer, chunkSize));
+				if (log.isTraceEnabled()) {
+					log.trace("Found " + current + " zero chunks");
+				}
+				if (limit > 0 && current >= limit) {
+					return false;
 				}
 				return true;
 			});
