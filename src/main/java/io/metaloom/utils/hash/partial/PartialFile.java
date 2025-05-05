@@ -55,6 +55,13 @@ public class PartialFile {
 		return nZeroChunks;
 	}
 
+	/**
+	 * Collect 4MB of chunk data from the partial file. Only non-zero chunks get picked.
+	 * 
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 */
 	public List<SegmentHash> computeHashes() throws NoSuchAlgorithmException, IOException {
 		if (!segmentHashes.isEmpty()) {
 			return segmentHashes;
