@@ -5,13 +5,13 @@
 
     <groupId>io.metaloom.utils</groupId>
     <artifactId>hash-utils</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>io.metaloom</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>2.1.0</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <name>Hash Utils</name>
@@ -66,7 +66,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>23</release>
+                    <release>25</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,7 +77,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <release>23</release>
+                    <release>25</release>
                 </configuration>
             </plugin>
             <plugin>
