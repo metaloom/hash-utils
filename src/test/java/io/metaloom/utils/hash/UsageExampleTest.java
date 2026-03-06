@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
+
 public class UsageExampleTest {
 
 	@Test
@@ -61,4 +62,5 @@ public class UsageExampleTest {
 		// SNIPPET END zero.example
 		assertEquals(0, count);
 	}
+
 }

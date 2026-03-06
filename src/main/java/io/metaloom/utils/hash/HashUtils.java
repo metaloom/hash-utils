@@ -63,6 +63,13 @@ public final class HashUtils {
 		return computeMD5(file.toPath());
 	}
 
+	public static MD5 computeMD5(String text) {
+		if (text == null) {
+			return null;
+		}
+		return computeMD5(text.getBytes());
+	}
+
 	public static MD5 computeMD5(Path path) {
 		return DEFAULT_HASHER.computeMD5(path);
 	}
@@ -105,7 +112,8 @@ public final class HashUtils {
 		return new String(hexChars);
 
 		/*
-		 * StringBuilder sb = new StringBuilder(2 * hashBytes.length); for (byte b : hashBytes) { sb.append(String.format("%02x", b & 0xff)); } return
+		 * StringBuilder sb = new StringBuilder(2 * hashBytes.length); for (byte b :
+		 * hashBytes) { sb.append(String.format("%02x", b & 0xff)); } return
 		 * sb.toString();
 		 */
 	}
@@ -120,14 +128,14 @@ public final class HashUtils {
 		int len = hex.length();
 		byte[] data = new byte[len / 2];
 		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-				+ Character.digit(hex.charAt(i + 1), 16));
+			data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
 		}
 		return data;
 	}
 
 	/**
-	 * Slice the given buffer into chunks and test each one individually for zeros. Returns the total count of found zero chunks.
+	 * Slice the given buffer into chunks and test each one individually for zeros.
+	 * Returns the total count of found zero chunks.
 	 * 
 	 * @param buffer
 	 * @param chunkSize

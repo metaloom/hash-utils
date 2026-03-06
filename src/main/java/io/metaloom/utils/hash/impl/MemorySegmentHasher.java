@@ -35,16 +35,18 @@ public class MemorySegmentHasher extends AbstractHasher {
 
 	@Override
 	public void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<ByteBuffer, Boolean> chunkReader) throws IOException {
-		MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, Arena.ofConfined());
-		while (start < len) {
-			long remaining = len - start;
-			int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
-			MemorySegment slice = seg.asSlice(start, bufferSize);
-			ByteBuffer buffer = slice.asByteBuffer();
-			if(!chunkReader.apply(buffer)) {
-				break;
+		try (Arena arena = Arena.ofConfined()) {
+			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, arena);
+			while (start < len) {
+				long remaining = len - start;
+				int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
+				MemorySegment slice = seg.asSlice(start, bufferSize);
+				ByteBuffer buffer = slice.asByteBuffer();
+				if (!chunkReader.apply(buffer)) {
+					break;
+				}
+				start += bufferSize;
 			}
-			start += bufferSize;
 		}
 	}
 
