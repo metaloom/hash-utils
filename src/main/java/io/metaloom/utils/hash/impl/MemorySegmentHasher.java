@@ -2,8 +2,6 @@ package io.metaloom.utils.hash.impl;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -40,16 +38,20 @@ public class MemorySegmentHasher extends AbstractHasher {
 		}
 		long cursor = Math.max(0, start);
 		long end = Math.min(len, channel.size());
+		ByteBuffer buffer = ByteBuffer.allocate(chunkSize);
 		while (cursor < end) {
 			int bufferSize = (int) Math.min((long) chunkSize, end - cursor);
-			try (Arena arena = Arena.ofConfined()) {
-				MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, cursor, bufferSize, arena);
-				ByteBuffer buffer = seg.asByteBuffer();
-				if (!chunkReader.apply(buffer)) {
-					break;
-				}
+			buffer.clear();
+			buffer.limit(bufferSize);
+			int read = channel.read(buffer, cursor);
+			if (read <= 0) {
+				break;
 			}
-			cursor += bufferSize;
+			buffer.flip();
+			if (!chunkReader.apply(buffer)) {
+				break;
+			}
+			cursor += read;
 		}
 	}
 

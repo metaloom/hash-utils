@@ -152,14 +152,7 @@ public final class HashUtils {
 		int fullChunkBytes = (remaining / chunkSize) * chunkSize;
 		int end = start + fullChunkBytes;
 		for (int chunkStart = start; chunkStart < end; chunkStart += chunkSize) {
-			boolean allZero = true;
-			for (int i = chunkStart; i < chunkStart + chunkSize; i++) {
-				if (buffer.get(i) != 0) {
-					allZero = false;
-					break;
-				}
-			}
-			if (allZero) {
+			if (isFullZeroChunk(buffer, chunkStart, chunkSize)) {
 				zeroChunks++;
 			}
 		}
@@ -179,10 +172,19 @@ public final class HashUtils {
 		if (chunk.remaining() != chunkSize) {
 			return false;
 		}
-		int start = chunk.position();
+		return isFullZeroChunk(chunk, chunk.position(), chunkSize);
+	}
+
+	private static boolean isFullZeroChunk(ByteBuffer buffer, int start, int chunkSize) {
 		int end = start + chunkSize;
-		for (int i = start; i < end; i++) {
-			if (chunk.get(i) != 0) {
+		int i = start;
+		for (; i + Long.BYTES <= end; i += Long.BYTES) {
+			if (buffer.getLong(i) != 0L) {
+				return false;
+			}
+		}
+		for (; i < end; i++) {
+			if (buffer.get(i) != 0) {
 				return false;
 			}
 		}

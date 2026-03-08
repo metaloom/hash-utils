@@ -90,14 +90,14 @@ public abstract class AbstractHasher implements Hasher {
 			long len = channel.size();
 			readChunks(channel, start, len, readBufferSize, buffer -> {
 				int current = nZeroChunks[0] += HashUtils.countZeroChunks(buffer, chunkSize);
-				if (log.isTraceEnabled()) {
-					log.trace("Found " + current + " zero chunks");
-				}
 				if (limit > 0 && current >= limit) {
 					return false;
 				}
 				return true;
 			});
+			if (log.isTraceEnabled()) {
+				log.trace("Found " + nZeroChunks[0] + " zero chunks");
+			}
 		}
 		return nZeroChunks[0];
 	}
