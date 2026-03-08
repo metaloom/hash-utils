@@ -14,15 +14,15 @@ import io.metaloom.utils.hash.AbstractHasher;
 
 public class MemorySegmentHasher extends AbstractHasher {
 
+	private static final int MAX_BUFFER_SIZE = 4096 * 128;
+
 	@Override
 	public byte[] hash(Path path, MessageDigest dig, Function<Long, Long> lenModifier) {
-		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
-			FileChannel fileChannel = rafile.getChannel();
+		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r"); FileChannel fileChannel = rafile.getChannel()) {
 			long len = fileChannel.size();
 			if (lenModifier != null) {
 				len = lenModifier.apply(len);
 			}
-			int MAX_BUFFER_SIZE = 4096 * 128;
 			readChunks(fileChannel, 0, len, MAX_BUFFER_SIZE, chunk -> {
 				dig.update(chunk);
 				return true;
@@ -35,18 +35,21 @@ public class MemorySegmentHasher extends AbstractHasher {
 
 	@Override
 	public void readChunks(FileChannel channel, long start, long len, int chunkSize, Function<ByteBuffer, Boolean> chunkReader) throws IOException {
-		try (Arena arena = Arena.ofConfined()) {
-			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, len, arena);
-			while (start < len) {
-				long remaining = len - start;
-				int bufferSize = remaining < chunkSize ? (int) remaining : chunkSize;
-				MemorySegment slice = seg.asSlice(start, bufferSize);
-				ByteBuffer buffer = slice.asByteBuffer();
+		if (chunkSize <= 0) {
+			throw new IllegalArgumentException("chunkSize must be larger than 0");
+		}
+		long cursor = Math.max(0, start);
+		long end = Math.min(len, channel.size());
+		while (cursor < end) {
+			int bufferSize = (int) Math.min((long) chunkSize, end - cursor);
+			try (Arena arena = Arena.ofConfined()) {
+				MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, cursor, bufferSize, arena);
+				ByteBuffer buffer = seg.asByteBuffer();
 				if (!chunkReader.apply(buffer)) {
 					break;
 				}
-				start += bufferSize;
 			}
+			cursor += bufferSize;
 		}
 	}
 
