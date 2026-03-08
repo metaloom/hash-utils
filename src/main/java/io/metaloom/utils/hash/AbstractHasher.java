@@ -85,8 +85,7 @@ public abstract class AbstractHasher implements Hasher {
 	public int computeZeroChunkCount(Path path, int limit) throws IOException {
 		final int chunkSize = HashUtils.DEFAULT_ZERO_CHUNK_SIZE;
 		AtomicInteger nZeroChunks = new AtomicInteger(0);
-		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r")) {
-			FileChannel channel = rafile.getChannel();
+		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r"); FileChannel channel = rafile.getChannel()) {
 			long start = 1 * 1024 * chunkSize; // 4 MB
 			long len = channel.size();
 			readChunks(channel, start, len, chunkSize * 128, buffer -> {
