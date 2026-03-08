@@ -143,15 +143,27 @@ public final class HashUtils {
 	 * @return
 	 */
 	public static int countZeroChunks(ByteBuffer buffer, int chunkSize) {
+		if (chunkSize <= 0) {
+			throw new IllegalArgumentException("chunkSize must be larger than 0");
+		}
 		int zeroChunks = 0;
-		while (buffer.remaining() >= chunkSize) {
-			ByteBuffer slice = buffer.slice(buffer.position(), chunkSize);
-			// Advance the buffer position
-			buffer.position(buffer.position() + slice.remaining());
-			if (HashUtils.isFullZeroChunk(slice, 4096)) {
+		int start = buffer.position();
+		int remaining = buffer.remaining();
+		int fullChunkBytes = (remaining / chunkSize) * chunkSize;
+		int end = start + fullChunkBytes;
+		for (int chunkStart = start; chunkStart < end; chunkStart += chunkSize) {
+			boolean allZero = true;
+			for (int i = chunkStart; i < chunkStart + chunkSize; i++) {
+				if (buffer.get(i) != 0) {
+					allZero = false;
+					break;
+				}
+			}
+			if (allZero) {
 				zeroChunks++;
 			}
 		}
+		buffer.position(end);
 		// Ignore the remaining bytes since it does not fill a full chunk
 		return zeroChunks;
 	}
@@ -167,9 +179,10 @@ public final class HashUtils {
 		if (chunk.remaining() != chunkSize) {
 			return false;
 		}
-		// chunk.slice(0, chunkSize);
-		while (chunk.hasRemaining()) {
-			if (chunk.get() != 0) {
+		int start = chunk.position();
+		int end = start + chunkSize;
+		for (int i = start; i < end; i++) {
+			if (chunk.get(i) != 0) {
 				return false;
 			}
 		}
