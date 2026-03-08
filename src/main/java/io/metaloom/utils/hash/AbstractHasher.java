@@ -2,6 +2,9 @@ package io.metaloom.utils.hash;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -84,22 +87,57 @@ public abstract class AbstractHasher implements Hasher {
 	public int computeZeroChunkCount(Path path, int limit) throws IOException {
 		final int chunkSize = HashUtils.DEFAULT_ZERO_CHUNK_SIZE;
 		final int readBufferSize = chunkSize * 1024;
-		final int[] nZeroChunks = { 0 };
-		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r"); FileChannel channel = rafile.getChannel()) {
-			long start = 1 * 1024 * chunkSize; // 4 MB
+		int nZeroChunks = 0;
+		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r");
+			FileChannel channel = rafile.getChannel();
+			Arena arena = Arena.ofConfined()) {
+			long start = 1L * 1024 * chunkSize; // 4 MB
 			long len = channel.size();
-			readChunks(channel, start, len, readBufferSize, buffer -> {
-				int current = nZeroChunks[0] += HashUtils.countZeroChunks(buffer, chunkSize);
-				if (limit > 0 && current >= limit) {
-					return false;
+			if (start >= len) {
+				return 0;
+			}
+
+			long mappableLen = len - start;
+			long fullChunkBytes = (mappableLen / chunkSize) * chunkSize;
+			if (fullChunkBytes == 0) {
+				return 0;
+			}
+
+			MemorySegment segment = channel.map(FileChannel.MapMode.READ_ONLY, start, fullChunkBytes, arena);
+			for (long blockStart = 0; blockStart < fullChunkBytes; blockStart += readBufferSize) {
+				long blockEnd = Math.min(blockStart + readBufferSize, fullChunkBytes);
+				int blockZeroChunks = 0;
+				for (long chunkStart = blockStart; chunkStart < blockEnd; chunkStart += chunkSize) {
+					if (isFullZeroChunk(segment, chunkStart, chunkSize)) {
+						blockZeroChunks++;
+					}
 				}
-				return true;
-			});
+				nZeroChunks += blockZeroChunks;
+				if (limit > 0 && nZeroChunks >= limit) {
+					break;
+				}
+			}
 			if (log.isTraceEnabled()) {
-				log.trace("Found " + nZeroChunks[0] + " zero chunks");
+				log.trace("Found " + nZeroChunks + " zero chunks");
 			}
 		}
-		return nZeroChunks[0];
+		return nZeroChunks;
+	}
+
+	private boolean isFullZeroChunk(MemorySegment segment, long start, int chunkSize) {
+		long end = start + chunkSize;
+		long i = start;
+		for (; i + Long.BYTES <= end; i += Long.BYTES) {
+			if (segment.get(ValueLayout.JAVA_LONG, i) != 0L) {
+				return false;
+			}
+		}
+		for (; i < end; i++) {
+			if (segment.get(ValueLayout.JAVA_BYTE, i) != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private String getHashAsHex(MessageDigest md) {
