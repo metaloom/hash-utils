@@ -75,10 +75,11 @@ public class PartialFile {
 			return segmentHashes;
 		}
 
-		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
+		try (RandomAccessFile rafile = new RandomAccessFile(file, "r");
 			FileChannel channel = rafile.getChannel();
+			Arena arena = Arena.ofConfined()) {
 
-			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size(), Arena.ofConfined());
+			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size(), arena);
 
 			long start = 1 * 1024 * CHUNK_SIZE; // 4 MB
 			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
@@ -126,10 +127,11 @@ public class PartialFile {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public double compareTo(File file) throws IOException, NoSuchAlgorithmException {
-		try (RandomAccessFile rafile = new RandomAccessFile(file, "r")) {
+		try (RandomAccessFile rafile = new RandomAccessFile(file, "r");
 			FileChannel fileChannel = rafile.getChannel();
+			Arena arena = Arena.ofConfined()) {
 
-			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), Arena.ofConfined());
+			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), arena);
 			long score = 0;
 			for (SegmentHash hash : computeHashes()) {
 				long start = hash.getStart();
