@@ -38,8 +38,8 @@ public abstract class AbstractHasherTest {
 	public static final SHA512 LARGE_SHA512 = SHA512.fromString("89b00a8dbc605d105b13a18d45f69f040212c1bdfb1bb99db5b565a6852e60d1b2b70a7216f4082715f3e00bcc8caf4d6d6f62ba2cce39e3281f549e755cec93");
 	public static final ChunkHash LARGE_CHUNK_HASH = ChunkHash.fromString("100673eb17f1299baa15a606947144eeb5b031a55c6e80f01ba6feaf35a46011");
 
-	public static final long VERY_LARGE = 6L * 1024L * 1024L * 1024L + 128L; // 6 GB
-	public static final SHA512 VERY_LARGE_SHA512 = SHA512.fromString("0880956965eb338f58569f411ebb69530c2e1eb17571c9ef7a96e2c4b7590a2c8b73a9ca5a538d4d063a5fa2215baf604e8bd45cc70fb067a870130abff46ef3");
+	public static final long VERY_LARGE_6GB = 6L * 1024L * 1024L * 1024L + 128L; // 6 GB
+	public static final SHA512 VERY_LARGE_6GB_SHA512 = SHA512.fromString("0880956965eb338f58569f411ebb69530c2e1eb17571c9ef7a96e2c4b7590a2c8b73a9ca5a538d4d063a5fa2215baf604e8bd45cc70fb067a870130abff46ef3");
 
 	protected Path createTestFile(long nRandomBytes, int zeroChunkCount) {
 		try {

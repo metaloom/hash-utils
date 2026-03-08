@@ -21,10 +21,10 @@ public class DefaultHasherTest extends AbstractHasherTest {
 
 	@Test
 	public void testVeryLargeFile() {
-		Path file = createTestFile(VERY_LARGE);
+		Path file = createTestFile(VERY_LARGE_6GB);
 		Hasher hasher = DefaultHasher.getHasher();
 		SHA512 h1 = hasher.computeSHA512(file);
-		assertEquals(VERY_LARGE_SHA512, h1.toString());
+		assertEquals(VERY_LARGE_6GB_SHA512, h1.toString());
 	}
 
 	@Test

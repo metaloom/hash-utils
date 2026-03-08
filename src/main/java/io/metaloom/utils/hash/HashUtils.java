@@ -17,6 +17,7 @@ public final class HashUtils {
 	}
 
 	// Chunk
+
 	public static ChunkHash computeChunkHash(File file) {
 		return computeChunkHash(file.toPath());
 	}
