@@ -76,24 +76,30 @@ public class PartialFile {
 		}
 
 		try (RandomAccessFile rafile = new RandomAccessFile(file, "r");
-			FileChannel channel = rafile.getChannel();
-			Arena arena = Arena.ofConfined()) {
+			FileChannel channel = rafile.getChannel()) {
 
-			MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size(), arena);
-
-			long start = 1 * 1024 * CHUNK_SIZE; // 4 MB
-			for (long i = start; i + CHUNK_SIZE < file.length(); i += CHUNK_SIZE) {
-				MemorySegment slice = seg.asSlice(i, CHUNK_SIZE);
-				ByteBuffer chunk = slice.asByteBuffer();
-				if (!HashUtils.isFullZeroChunk(chunk, CHUNK_SIZE)) {
-					chunk.position(0);
-					// We were previously in zero area. This means a new chunk starts
-					SegmentHash sh = new SegmentHash(i, CHUNK_SIZE, HashUtils.computeMD5(chunk));
-					segmentHashes.add(sh);
-				}
-				// No need to collect more than 1024 non zero chunks (4 MB)
-				if (segmentHashes.size() > 1024) {
-					break;
+			long fileSize = channel.size();
+			long start = 1L * 1024 * CHUNK_SIZE; // 4 MB
+			int mapSize = CHUNK_SIZE * 1024; // 4 MB mapping window
+			boolean done = false;
+			for (long mapOffset = start; mapOffset < fileSize && !done; mapOffset += mapSize) {
+				long mapLen = Math.min(mapSize, fileSize - mapOffset);
+				try (Arena arena = Arena.ofConfined()) {
+					MemorySegment seg = channel.map(FileChannel.MapMode.READ_ONLY, mapOffset, mapLen, arena);
+					for (long off = 0; off + CHUNK_SIZE <= mapLen; off += CHUNK_SIZE) {
+						MemorySegment slice = seg.asSlice(off, CHUNK_SIZE);
+						ByteBuffer chunk = slice.asByteBuffer();
+						if (!HashUtils.isFullZeroChunk(chunk, CHUNK_SIZE)) {
+							chunk.position(0);
+							SegmentHash sh = new SegmentHash(mapOffset + off, CHUNK_SIZE, HashUtils.computeMD5(chunk));
+							segmentHashes.add(sh);
+						}
+						// No need to collect more than 1024 non zero chunks (4 MB)
+						if (segmentHashes.size() > 1024) {
+							done = true;
+							break;
+						}
+					}
 				}
 			}
 
@@ -128,18 +134,18 @@ public class PartialFile {
 	 */
 	public double compareTo(File file) throws IOException, NoSuchAlgorithmException {
 		try (RandomAccessFile rafile = new RandomAccessFile(file, "r");
-			FileChannel fileChannel = rafile.getChannel();
-			Arena arena = Arena.ofConfined()) {
+			FileChannel fileChannel = rafile.getChannel()) {
 
-			MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size(), arena);
 			long score = 0;
 			for (SegmentHash hash : computeHashes()) {
 				long start = hash.getStart();
-				MemorySegment slice = seg.asSlice(start, hash.getLen());
-				ByteBuffer chunk = slice.asByteBuffer();
-				MD5 newHash = HashUtils.computeMD5(chunk);
-				if (newHash.equals(hash.getHash())) {
-					score++;
+				try (Arena arena = Arena.ofConfined()) {
+					MemorySegment seg = fileChannel.map(FileChannel.MapMode.READ_ONLY, start, hash.getLen(), arena);
+					ByteBuffer chunk = seg.asByteBuffer();
+					MD5 newHash = HashUtils.computeMD5(chunk);
+					if (newHash.equals(hash.getHash())) {
+						score++;
+					}
 				}
 			}
 

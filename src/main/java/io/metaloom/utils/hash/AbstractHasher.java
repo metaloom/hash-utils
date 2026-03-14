@@ -89,8 +89,7 @@ public abstract class AbstractHasher implements Hasher {
 		final int readBufferSize = chunkSize * 1024;
 		int nZeroChunks = 0;
 		try (RandomAccessFile rafile = new RandomAccessFile(path.toFile(), "r");
-			FileChannel channel = rafile.getChannel();
-			Arena arena = Arena.ofConfined()) {
+			FileChannel channel = rafile.getChannel()) {
 			long start = 1L * 1024 * chunkSize; // 4 MB
 			long len = channel.size();
 			if (start >= len) {
@@ -103,13 +102,15 @@ public abstract class AbstractHasher implements Hasher {
 				return 0;
 			}
 
-			MemorySegment segment = channel.map(FileChannel.MapMode.READ_ONLY, start, fullChunkBytes, arena);
 			for (long blockStart = 0; blockStart < fullChunkBytes; blockStart += readBufferSize) {
-				long blockEnd = Math.min(blockStart + readBufferSize, fullChunkBytes);
+				long blockLen = Math.min(readBufferSize, fullChunkBytes - blockStart);
 				int blockZeroChunks = 0;
-				for (long chunkStart = blockStart; chunkStart < blockEnd; chunkStart += chunkSize) {
-					if (isFullZeroChunk(segment, chunkStart, chunkSize)) {
-						blockZeroChunks++;
+				try (Arena arena = Arena.ofConfined()) {
+					MemorySegment segment = channel.map(FileChannel.MapMode.READ_ONLY, start + blockStart, blockLen, arena);
+					for (long chunkStart = 0; chunkStart < blockLen; chunkStart += chunkSize) {
+						if (isFullZeroChunk(segment, chunkStart, chunkSize)) {
+							blockZeroChunks++;
+						}
 					}
 				}
 				nZeroChunks += blockZeroChunks;
